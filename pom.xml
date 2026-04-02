@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.project</groupId>
-    <artifactId>linky-BE-project</artifactId>
+    <artifactId>linky-BE-project111</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>linky-BE-project</name>
     <description>linky-BE-project</description>
