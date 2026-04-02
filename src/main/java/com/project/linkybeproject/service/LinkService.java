@@ -30,4 +30,16 @@ public class LinkService {
     public List<Link> getAllLinks() {
         return linkRepository.findAll(); // DB에서 모두 꺼내오기!
     }
+
+    // 3. 특정 링크 1개 상세 조회 기능
+    public Link getLink(Long id) {
+        // DB에서 id로 링크를 찾고, 만약 없으면 에러 메시지를 던집니다.
+        return linkRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 링크입니다."));
+    }
+
+    // 4. 링크 삭제 기능
+    public void deleteLink(Long id) {
+        linkRepository.deleteById(id); // DB에서 해당 id의 링크를 지웁니다!
+    }
 }

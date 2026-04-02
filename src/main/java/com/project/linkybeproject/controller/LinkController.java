@@ -32,4 +32,18 @@ public class LinkController {
         List<Link> links = linkService.getAllLinks();
         return ApiResponse.success(links);
     }
+
+    // 3. 링크 상세 조회 API (예: GET /links/1)
+    @GetMapping("/{id}")
+    public ApiResponse<Link> getLink(@PathVariable Long id) {
+        Link link = linkService.getLink(id);
+        return ApiResponse.success(link);
+    }
+
+    // 4. 링크 삭제 API (예: DELETE /links/1)
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteLink(@PathVariable Long id) {
+        linkService.deleteLink(id);
+        return ApiResponse.success(null); // 삭제는 돌려줄 데이터가 없으므로 null을 보냅니다.
+    }
 }
