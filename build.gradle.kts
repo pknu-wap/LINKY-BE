@@ -25,6 +25,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.springframework.boot:spring-boot-starter-security") // 인증
+    implementation("io.jsonwebtoken:jjwt:0.9.1") // JWT
+    implementation("org.projectlombok:lombok") // getter/setter 자동
+    annotationProcessor("org.projectlombok:lombok")
+
+    implementation("org.jsoup:jsoup:1.15.3") // (3주차용 미리 추가해도 OK)
 }
 
 tasks.withType<Test> {
