@@ -1,6 +1,7 @@
 package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 @Entity
 public class Link {
@@ -9,6 +10,7 @@ public class Link {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     private String url;
     private String title;
     private String siteName;
@@ -20,4 +22,5 @@ public class Link {
     public void assignUser(User user) {
         this.user = user;
     }
+
 }

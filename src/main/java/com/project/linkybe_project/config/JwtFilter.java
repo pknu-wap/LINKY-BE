@@ -3,9 +3,12 @@ package com.project.linkybe_project.config;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +28,11 @@ public class JwtFilter implements Filter {
 
             if (jwtUtil.validate(token)) {
                 String email = jwtUtil.getEmail(token);
-                request.setAttribute("email", email);
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 

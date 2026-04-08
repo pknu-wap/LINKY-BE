@@ -13,21 +13,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public void signup(String email, String password) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password); // 👉 나중에 암호화
-        userRepository.save(user);
-    }
+    public String kakaoLogin(String email) {
 
-    public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setEmail(email);
+                    newUser.setPassword("KAKAO"); // 의미 없음
+                    return userRepository.save(newUser);
+                });
 
-        if (!user.getPassword().equals(password)) {
-            throw new RuntimeException("비밀번호 틀림");
-        }
-
-        return jwtUtil.generateToken(email);
+        return jwtUtil.generateToken(user.getEmail());
     }
 }
