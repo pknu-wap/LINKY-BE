@@ -1,48 +1,43 @@
 package com.project.linkybe_project.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import org.json.JSONObject;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoService {
 
+    private final RestTemplate restTemplate;
+
     public String getEmail(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
         try {
-            URL url = new URL("https://kapi.kakao.com/v2/user/me");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream())
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    "https://kapi.kakao.com/v2/user/me",
+                    HttpMethod.GET,
+                    entity,
+                    Map.class
             );
 
-            StringBuilder response = new StringBuilder();
-            String line;
+            Map<?, ?> kakaoAccount = (Map<?, ?>) response.getBody().get("kakao_account");
 
-            while ((line = br.readLine()) != null) {
-                response.append(line);
-            }
-
-            JSONObject json = new JSONObject(response.toString());
-
-            JSONObject kakaoAccount = json.getJSONObject("kakao_account");
-
-            // ⚠️ 이메일 제공 안할 수도 있음
-            if (!kakaoAccount.has("email")) {
+            if (kakaoAccount == null || !kakaoAccount.containsKey("email")) {
                 throw new RuntimeException("이메일 제공 동의 필요");
             }
 
-            return kakaoAccount.getString("email");
+            return (String) kakaoAccount.get("email");
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("카카오 인증 실패");
+            throw new RuntimeException("카카오 인증 실패", e);
         }
     }
 }
