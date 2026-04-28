@@ -3,7 +3,7 @@ spring:
     url: jdbc:mysql://localhost:3306/linky_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 1234
+    password: Songsiyeon030510
   jpa:
     open-in-view: false
     hibernate:
@@ -13,4 +13,3 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-
