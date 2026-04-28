@@ -3,12 +3,15 @@ package com.project.linkybe_project.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -18,7 +21,7 @@ public class User {
     private String email;
     private String password;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    // getter/setter
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 }
