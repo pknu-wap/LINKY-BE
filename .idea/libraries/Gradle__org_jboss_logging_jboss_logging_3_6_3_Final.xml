@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jboss.logging:jboss-logging:3.6.3.Final" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jboss.logging" artifactId="jboss-logging" version="3.6.3.Final" baseVersion="3.6.3.Final" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jboss.logging/jboss-logging/3.6.3.Final/1cc9f976725720bb4a66f80af3e3aa6b9890d969/jboss-logging-3.6.3.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

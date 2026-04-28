@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.glassfish.jaxb:txw2:4.0.6" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.glassfish.jaxb" artifactId="txw2" version="4.0.6" baseVersion="4.0.6" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.glassfish.jaxb/txw2/4.0.6/4f4cd53b5ff9a2c5aa1211f15ed2569c57dfb044/txw2-4.0.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

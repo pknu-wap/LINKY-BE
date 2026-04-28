@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.osgi:org.osgi.annotation.bundle:2.0.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.osgi" artifactId="org.osgi.annotation.bundle" version="2.0.0" baseVersion="2.0.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.bundle/2.0.0/f5c2cd6e670c3c5d440d3003efd5ef2ead5c68eb/org.osgi.annotation.bundle-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

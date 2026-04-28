@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.fasterxml:classmate:1.7.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.fasterxml" artifactId="classmate" version="1.7.3" baseVersion="1.7.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml/classmate/1.7.3/f61c7e7b81e9249b0f6a05914eff9d54fb09f4a0/classmate-1.7.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

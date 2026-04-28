@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: biz.aQute.bnd:biz.aQute.bnd.annotation:7.1.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="biz.aQute.bnd" artifactId="biz.aQute.bnd.annotation" version="7.1.0" baseVersion="7.1.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/biz.aQute.bnd/biz.aQute.bnd.annotation/7.1.0/2f2be18c936d08cf46ea6cfa0043f34afdf38705/biz.aQute.bnd.annotation-7.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

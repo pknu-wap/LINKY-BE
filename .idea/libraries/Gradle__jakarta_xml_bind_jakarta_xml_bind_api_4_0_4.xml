@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: jakarta.xml.bind:jakarta.xml.bind-api:4.0.4" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="jakarta.xml.bind" artifactId="jakarta.xml.bind-api" version="4.0.4" baseVersion="4.0.4" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.xml.bind/jakarta.xml.bind-api/4.0.4/d6d2327f3817d9a33a3b6b8f2e15a96bc2e7afdc/jakarta.xml.bind-api-4.0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

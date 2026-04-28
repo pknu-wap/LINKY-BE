@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.osgi:org.osgi.annotation.versioning:1.1.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.osgi" artifactId="org.osgi.annotation.versioning" version="1.1.2" baseVersion="1.1.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.osgi/org.osgi.annotation.versioning/1.1.2/dc3cd4ec96c0b3c5459fe00694bd73a816ecf93e/org.osgi.annotation.versioning-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
