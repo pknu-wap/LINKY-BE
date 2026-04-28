@@ -3,6 +3,5 @@ src/main/resources/application.yaml
 /out
 /build
 /.idea
-target/
-build/
-.gradle/
+/target
+/.gradle
