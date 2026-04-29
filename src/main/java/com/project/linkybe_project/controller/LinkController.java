@@ -4,6 +4,7 @@ import com.project.linkybe_project.dto.ApiResponse;
 import com.project.linkybe_project.dto.LinkRequest;
 import com.project.linkybe_project.entity.Link;
 import com.project.linkybe_project.service.LinkService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class LinkController {
     private final LinkService linkService;
 
     @PostMapping
-    public ApiResponse<?> saveLink(@RequestBody LinkRequest request,
+    public ApiResponse<?> saveLink(@Valid @RequestBody LinkRequest request, // 👈 여기에 @Valid 추가!
                                    Authentication authentication) {
         String kakaoId = (String) authentication.getPrincipal();
         linkService.saveLink(kakaoId, request);

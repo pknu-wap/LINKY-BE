@@ -2,10 +2,12 @@ package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Entity
+@Getter
+@NoArgsConstructor // JPA 엔티티는 기본 생성자가 필수
 public class Link {
 
     @Id
@@ -13,12 +15,16 @@ public class Link {
     private Long id;
 
     @Setter
+    @Column(nullable = false)
     private String url;
-
     private String title;
     private String siteName;
+    private String thumbnailUrl;
 
-    @ManyToOne
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY) // 지연 로딩을 설정
     @JoinColumn(name = "user_id")
     private User user;
 
