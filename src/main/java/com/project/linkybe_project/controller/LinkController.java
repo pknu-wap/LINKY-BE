@@ -20,14 +20,14 @@ public class LinkController {
     @PostMapping
     public ApiResponse<?> saveLink(@RequestBody LinkRequest request,
                                    Authentication authentication) {
-        String email = (String) authentication.getPrincipal();
-        linkService.saveLink(email, request);
+        String kakaoId = (String) authentication.getPrincipal();
+        linkService.saveLink(kakaoId, request);
         return ApiResponse.success(null);
     }
 
     @GetMapping
     public ApiResponse<List<Link>> getLinks(Authentication authentication) {
-        String email = (String) authentication.getPrincipal();
-        return ApiResponse.success(linkService.getLinks(email));
+        String kakaoId = (String) authentication.getPrincipal();
+        return ApiResponse.success(linkService.getLinks(kakaoId));
     }
 }

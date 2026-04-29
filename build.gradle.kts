@@ -24,12 +24,16 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("org.springframework.boot:spring-boot-starter-security") // 인증
-    implementation("io.jsonwebtoken:jjwt:0.9.1") // JWT
-    implementation("org.projectlombok:lombok") // getter/setter 자동
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.jsoup:jsoup:1.15.3") // (3주차용 미리 추가해도 OK)
+    // JWT (Java 17 호환 버전)
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    implementation("org.jsoup:jsoup:1.15.3")
     implementation("org.json:json:20230227")
 }
 

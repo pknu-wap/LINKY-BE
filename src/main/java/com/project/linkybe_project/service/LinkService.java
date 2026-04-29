@@ -17,8 +17,8 @@ public class LinkService {
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
 
-    public void saveLink(String email, LinkRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void saveLink(String kakaoId, LinkRequest request) {
+        User user = userRepository.findByKakaoId(kakaoId)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 
         Link link = new Link();
@@ -28,8 +28,8 @@ public class LinkService {
         linkRepository.save(link);
     }
 
-    public List<Link> getLinks(String email) {
-        User user = userRepository.findByEmail(email)
+    public List<Link> getLinks(String kakaoId) {
+        User user = userRepository.findByKakaoId(kakaoId)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 
         return linkRepository.findByUserOrderByIdDesc(user);
