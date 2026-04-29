@@ -18,8 +18,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-    private String password;
+    @Column(unique = true, nullable = false)
+    private String kakaoId; // 카카오 고유 ID (항상 제공됨)
+
+    private String email;   // 이메일 (동의한 경우에만 저장, 없으면 null)
+    private String provider; // 로그인 방식 ("KAKAO")
 
     @CreatedDate
     @Column(updatable = false)
