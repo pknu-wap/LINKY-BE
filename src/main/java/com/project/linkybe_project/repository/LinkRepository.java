@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface LinkRepository extends JpaRepository<Link, Long> {
     List<Link> findByUser(User user);
+
     List<Link> findByUserOrderByIdDesc(User user);
 }
