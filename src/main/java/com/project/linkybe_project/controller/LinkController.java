@@ -5,6 +5,7 @@ import com.project.linkybe_project.dto.LinkRequest;
 import com.project.linkybe_project.dto.LinkResponse;
 import com.project.linkybe_project.dto.LinkUpdateRequest;
 import com.project.linkybe_project.service.LinkService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

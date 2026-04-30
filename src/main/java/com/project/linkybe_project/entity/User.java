@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class User {
-
     @Id
     private String kakaoId; // 카카오 고유 ID (항상 제공됨)
 
