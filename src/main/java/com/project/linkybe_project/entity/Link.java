@@ -2,7 +2,6 @@ package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -25,7 +24,6 @@ public class Link {
     private String title;       // 팀원이 메타데이터로 채워줄 필드
     private String siteName;    // 팀원이 메타데이터로 채워줄 필드
     private String thumbnailUrl; // 팀원이 메타데이터로 채워줄 필드
-    private String description;
 
     private String memo;        // 사용자 메모
 
@@ -37,8 +35,6 @@ public class Link {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "TEXT")
-    @ManyToOne(fetch = FetchType.LAZY) // 지연 로딩을 설정
     @JoinColumn(name = "user_id")
     private User user;
 }
