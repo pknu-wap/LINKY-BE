@@ -1,6 +1,7 @@
 package com.project.linkybe_project.config;
 
 import com.project.linkybe_project.dto.ApiResponse;
+import com.project.linkybe_project.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,11 +19,11 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(e.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
-        log.error("Exception: ", e);
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e) {
+        log.error("CustomException: ", e);
         return ResponseEntity
-                .internalServerError()
-                .body(ApiResponse.error(e.getMessage())); // 임시로 실제 메시지 노출
+                .status(e.getStatus())
+                .body(ApiResponse.error(e.getMessage()));
     }
 }

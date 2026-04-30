@@ -1,6 +1,9 @@
 package com.project.linkybe_project.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,14 +18,10 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
     private String kakaoId; // 카카오 고유 ID (항상 제공됨)
 
-    private String email;   // 이메일 (동의한 경우에만 저장, 없으면 null)
-    private String provider; // 로그인 방식 ("KAKAO")
+    @Column
+    private String refreshToken; // 리프레시 토큰 저장 (탈취 방지용 DB 비교)
 
     @CreatedDate
     @Column(updatable = false)
