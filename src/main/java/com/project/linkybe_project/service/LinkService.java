@@ -31,8 +31,6 @@ public class LinkService {
         link.assignUser(user);
 
         link.setTitle(metadata.title());
-        link.setImageUrl(metadata.imageUrl());
-        link.setSummary(metadata.description());
 
         linkRepository.save(link);
     }

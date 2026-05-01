@@ -19,10 +19,9 @@ public class Link {
     @Column(nullable = false)
     private String url;
     private String title;
-    private String imageUrl;
-    private String summary;
-    private String siteName;
-    private String thumbnailUrl;
+    private String category;
+    private String isPrivate;
+    private String selectedDate;
 
     @Column(columnDefinition = "TEXT")
     private String description;
