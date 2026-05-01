@@ -29,6 +29,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt:0.9.1") // JWT
     implementation("org.projectlombok:lombok") // getter/setter 자동
     annotationProcessor("org.projectlombok:lombok")
+    implementation("org.jsoup:jsoup:1.17.2")
 
 
 

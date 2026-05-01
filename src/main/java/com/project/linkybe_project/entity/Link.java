@@ -7,7 +7,8 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@NoArgsConstructor // JPA 엔티티는 기본 생성자가 필수
+@NoArgsConstructor
+@Setter// JPA 엔티티는 기본 생성자가 필수
 public class Link {
 
     @Id
@@ -18,6 +19,8 @@ public class Link {
     @Column(nullable = false)
     private String url;
     private String title;
+    private String imageUrl;
+    private String summary;
     private String siteName;
     private String thumbnailUrl;
 
