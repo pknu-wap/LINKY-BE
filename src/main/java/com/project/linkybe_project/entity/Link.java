@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -20,8 +22,8 @@ public class Link {
     private String url;
     private String title;
     private String category;
-    private String isPrivate;
-    private String selectedDate;
+    private Boolean isPrivate;
+    private LocalDateTime selectedDate;
 
     @Column(columnDefinition = "TEXT")
     private String description;
