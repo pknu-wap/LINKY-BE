@@ -1,6 +1,5 @@
 package com.project.linkybe_project.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +10,6 @@ import java.time.LocalDateTime;
 @Setter // 프론트에서 온 JSON 데이터를 세팅하기 위해 필요!
 @NoArgsConstructor // 기본 생성자도 추가해 주는 것이 안전해
 public class LinkRequest {
-
-    // 빈 문자열(""), 공백(" "), null 값을 모두 막아줍니다.
-    @NotBlank(message = "URL은 필수 입력값입니다.")
     private String url;
 
     // 사용자가 직접 입력할 수 있는 제목 (없을 수도 있으니 검증 어노테이션은 생략)

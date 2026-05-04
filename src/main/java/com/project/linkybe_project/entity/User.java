@@ -1,6 +1,9 @@
 package com.project.linkybe_project.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,11 +16,16 @@ import java.time.LocalDateTime;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     private String password;
+    private String kakaoId; // 카카오 고유 ID (항상 제공됨)
+
+    @Column
+    private String refreshToken; // 리프레시 토큰 저장 (탈취 방지용 DB 비교)
 
     @CreatedDate
     @Column(updatable = false)
