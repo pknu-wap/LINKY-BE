@@ -2,6 +2,7 @@ package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -25,13 +26,6 @@ public class Link {
     private String category;
     private Boolean isPrivate;
     private LocalDateTime selectedDate;
-
-    private String title;       // 팀원이 메타데이터로 채워줄 필드
-    private String siteName;    // 팀원이 메타데이터로 채워줄 필드
-    private String thumbnailUrl; // 팀원이 메타데이터로 채워줄 필드
-
-    @Column(length = 50)
-    private String category;    // 카테고리 (직접 입력)
 
     @CreatedDate
     @Column(updatable = false)
