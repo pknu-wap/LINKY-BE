@@ -18,6 +18,10 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String email;
+    private String password;
     private String kakaoId; // 카카오 고유 ID (항상 제공됨)
 
     @Column

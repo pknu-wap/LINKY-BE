@@ -27,6 +27,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("org.jsoup:jsoup:1.17.2")
 
     // JWT (Java 17 호환 버전)
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")

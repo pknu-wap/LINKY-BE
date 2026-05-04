@@ -8,9 +8,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
+@Getter
+@NoArgsConstructor
+@Setter// JPA 엔티티는 기본 생성자가 필수
 @EntityListeners(AuditingEntityListener.class)
 public class Link {
 
@@ -20,12 +21,14 @@ public class Link {
 
     @Column(nullable = false, length = 2048)
     private String url;
+    private String title;
+    private String category;
+    private Boolean isPrivate;
+    private LocalDateTime selectedDate;
 
     private String title;       // 팀원이 메타데이터로 채워줄 필드
     private String siteName;    // 팀원이 메타데이터로 채워줄 필드
     private String thumbnailUrl; // 팀원이 메타데이터로 채워줄 필드
-
-    private String memo;        // 사용자 메모
 
     @Column(length = 50)
     private String category;    // 카테고리 (직접 입력)
