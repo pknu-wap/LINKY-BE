@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Setter
@@ -19,7 +17,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @Index(name = "idx_link_user_id", columnList = "user_id"),
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 public class Link {
 
     @Id
@@ -35,16 +32,6 @@ public class Link {
     private String category; // 카테고리 (예: "개발", "미분류")
     private Boolean isPrivate; // 공개(false) / 비공개(true)
     private LocalDateTime selectedDate; // 사용자가 지정한 날짜 (리마인더용)
-
-    // ── 팀원이 채워줄 메타데이터 필드 ──────────────────
-    private String siteName; // 사이트명 (예: "YouTube")
-    private String thumbnailUrl; // 썸네일 URL
-    private String memo; // 사용자 메모
-
-    // ── 자동 기록 ──────────────────────────────────────
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 
     // ── 연관관계 ───────────────────────────────────────
     // LAZY: 트랜잭션 안에서만 user 접근 — open-in-view: false와 안전하게 호환
