@@ -20,7 +20,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "kakao_id", nullable = false, unique = true)
     private String kakaoId; // 카카오 고유 ID — 유저 식별 기준
 
     @Column(length = 512)
