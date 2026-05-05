@@ -3,13 +3,16 @@ package com.project.linkybe_project.service;
 import com.project.linkybe_project.config.JwtUtil;
 import com.project.linkybe_project.dto.TokenResponse;
 import com.project.linkybe_project.entity.User;
+import com.project.linkybe_project.exception.CustomException;
 import com.project.linkybe_project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -21,51 +24,55 @@ public class AuthService {
     public TokenResponse kakaoLogin(Map<String, String> userInfo) {
         String kakaoId = userInfo.get("kakaoId");
 
-        // 신규 유저면 저장, 기존 유저면 조회
+        // 신규 유저면 DB 저장, 기존 유저면 조회
         User user = userRepository.findByKakaoId(kakaoId)
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setKakaoId(kakaoId);
-                    return userRepository.save(newUser);
+                    User saved = userRepository.save(newUser);
+                    log.info("신규 유저 등록 — kakaoId: {}", kakaoId);
+                    return saved;
                 });
 
-        // 액세스 토큰 + 리프레시 토큰 발급
-        String accessToken = jwtUtil.generateToken(user.getKakaoId());
+        String accessToken  = jwtUtil.generateToken(user.getKakaoId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getKakaoId());
 
-        // 리프레시 토큰 DB 저장 (탈취 방지를 위해 서버에서 보관)
+        // refreshToken DB 저장 (탈취 방지용 서버 보관)
         user.setRefreshToken(refreshToken);
+        // @Transactional 더티 체킹으로 자동 UPDATE — save() 생략 가능하지만 명시
         userRepository.save(user);
 
+        log.info("로그인 완료 — kakaoId: {}", kakaoId);
         return new TokenResponse(accessToken, refreshToken);
     }
 
     @Transactional
     public TokenResponse refresh(String refreshToken) {
-        // 1. 토큰 서명/만료 검증
+        // 1. 서명/만료 검증
         if (!jwtUtil.validate(refreshToken)) {
-            throw new RuntimeException("유효하지 않거나 만료된 리프레시 토큰입니다.");
+            throw CustomException.unauthorized("유효하지 않거나 만료된 리프레시 토큰입니다.");
         }
 
         // 2. 토큰에서 kakaoId 추출
         String kakaoId = jwtUtil.getKakaoId(refreshToken);
 
-        // 3. DB에서 유저 조회
+        // 3. DB 유저 조회
         User user = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> CustomException.notFound("존재하지 않는 유저입니다."));
 
-        // 4. DB에 저장된 리프레시 토큰과 비교 (탈취된 토큰 차단)
+        // 4. DB 저장 토큰과 비교 (탈취된 토큰 차단)
         if (!refreshToken.equals(user.getRefreshToken())) {
-            throw new RuntimeException("리프레시 토큰이 일치하지 않습니다. 재로그인이 필요합니다.");
+            throw CustomException.unauthorized("리프레시 토큰이 일치하지 않습니다. 재로그인이 필요합니다.");
         }
 
-        // 5. 새 토큰 발급 (Rotation: 리프레시 토큰도 새로 발급하여 DB 갱신)
-        String newAccessToken = jwtUtil.generateToken(kakaoId);
+        // 5. 새 토큰 발급 (Rotation 방식 — 리프레시 토큰도 교체)
+        String newAccessToken  = jwtUtil.generateToken(kakaoId);
         String newRefreshToken = jwtUtil.generateRefreshToken(kakaoId);
 
         user.setRefreshToken(newRefreshToken);
         userRepository.save(user);
 
+        log.info("토큰 갱신 완료 — kakaoId: {}", kakaoId);
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
 }
