@@ -13,8 +13,8 @@ import lombok.Setter;
 @Table(
     name = "link",
     indexes = {
-        // 유저별 링크 조회가 가장 빈번하므로 복합 인덱스 추가
-        @Index(name = "idx_link_user_id", columnList = "user_id"),
+        // 유저별 링크 조회가 가장 빈번하므로 인덱스 추가
+        @Index(name = "idx_link_kakao_id", columnList = "kakao_id"),
     }
 )
 public class Link {
@@ -34,11 +34,8 @@ public class Link {
     private LocalDateTime selectedDate; // 사용자가 지정한 날짜 (리마인더용)
 
     // ── 연관관계 ───────────────────────────────────────
-    // LAZY: 트랜잭션 안에서만 user 접근 — open-in-view: false와 안전하게 호환
+    // FK는 users.kakao_id (unique) 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "kakao_id", referencedColumnName = "kakao_id", nullable = false)
     private User user;
-
-    @Column(name = "kakao_id", nullable = false)
-    private String kakaoId;
 }
