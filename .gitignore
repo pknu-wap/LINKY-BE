@@ -1,5 +1,6 @@
 src/main/resources/application.yml
 src/main/resources/application.yaml
+src/test/resources/application.yaml
 /out
 /build
 /.idea

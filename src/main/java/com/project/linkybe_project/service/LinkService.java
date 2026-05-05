@@ -45,6 +45,7 @@ public class LinkService {
         link.setSelectedDate(request.getSelectedDate());
         link.setMemo(request.getMemo());
         link.setUser(user);
+        link.setKakaoId(user.getKakaoId());
 
         Link saved = linkRepository.save(link);
         log.info("링크 저장 완료 — linkId: {}", saved.getId());
@@ -174,6 +175,7 @@ public class LinkService {
             link.setIsPrivate(parts.length > 4 && "true".equalsIgnoreCase(parts[4].trim()));
             link.setMemo(parts.length > 6 ? unescapeCsv(parts[6]) : null);
             link.setUser(user);
+            link.setKakaoId(user.getKakaoId());
 
             linkRepository.save(link);
             count++;
