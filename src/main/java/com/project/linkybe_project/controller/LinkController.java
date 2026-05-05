@@ -20,9 +20,6 @@ public class LinkController {
     private final LinkService linkService;
 
     // ───────────────────────────────────────────────
-    // POST /links — 링크 저장
-    // Body: { "url": "...", "memo": "...", "category": "..." }
-    // ───────────────────────────────────────────────
     @PostMapping
     public ApiResponse<LinkResponse> saveLink_DB(@RequestBody LinkRequest request, Authentication authentication) {
         String kakaoId = (String) authentication.getPrincipal();
