@@ -52,9 +52,4 @@ public class Link {
 
     @Column(name = "kakao_id", nullable = false)
     private String kakaoId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kakao_id", referencedColumnName = "kakao_id",
-            insertable = false, updatable = false)
-    private User kakaoUser;
 }
