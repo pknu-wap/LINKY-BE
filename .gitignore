@@ -6,3 +6,4 @@ src/test/resources/application.yaml
 /.idea
 /target
 /.gradle
+app.log
