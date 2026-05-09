@@ -16,4 +16,5 @@ public class LinkRequest {
     private String category;        // 선택 (없으면 null)
     private Boolean isPrivate;      // 선택 (없으면 null → false 처리)
     private LocalDateTime selectedDate; // 선택 (리마인더 날짜)
+    private String memo;            // 선택 (사용자 메모)
 }

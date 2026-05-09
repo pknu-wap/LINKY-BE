@@ -15,4 +15,5 @@ public class LinkUpdateRequest {
     private String category;
     private Boolean isPrivate;
     private LocalDateTime selectedDate;
+    private String memo;
 }

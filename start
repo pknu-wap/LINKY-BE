@@ -1,1 +1,0 @@
-nohup java -jar build/libs/LINKY-BE_PROJECT-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
