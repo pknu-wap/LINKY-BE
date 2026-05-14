@@ -1,6 +1,7 @@
 package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,4 +35,12 @@ public class Link {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Setter(AccessLevel.NONE)
+    @Column(columnDefinition = "TEXT")
+    private String summary;
+
+    public void updateSummary(String summary) {
+        this.summary = summary;
+    }
 }

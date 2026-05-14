@@ -7,8 +7,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter // 프론트에서 온 JSON 데이터를 세팅하기 위해 필요!
-@NoArgsConstructor // 기본 생성자도 추가해 주는 것이 안전해
+@Setter // 프론트에서 온 JSON 데이터를 세팅하기 위해 필요
+@NoArgsConstructor // 기본 생성자도 추가해 주는 것이 안전
 public class LinkRequest {
     private String url;
 
@@ -24,4 +24,6 @@ public class LinkRequest {
     // 프론트에서 toIso8601String()으로 보낸 텍스트를 LocalDateTime으로 자동 변환해 줌
     private LocalDateTime selectedDate;
 
+    // 사용자가 요약칸을 직접 작성하거나, 수정해서 서버로 보낼 때 이 필드에 담기게 됨.
+    private String summary;
 }

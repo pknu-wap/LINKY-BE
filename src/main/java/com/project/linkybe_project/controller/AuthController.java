@@ -8,6 +8,7 @@ import com.project.linkybe_project.service.AuthService;
 import com.project.linkybe_project.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -54,5 +55,23 @@ public class AuthController {
         TokenResponse tokens = authService.refresh(request.getRefreshToken());
 
         return ApiResponse.success(tokens);
+    }
+
+    // ───────────────────────────────────────────────
+    // 회원 탈퇴 API (새로 추가됨!)
+    // ───────────────────────────────────────────────
+    @DeleteMapping("/withdraw")
+    public ApiResponse<?> withdrawUser(Authentication authentication) {
+        log.info("회원 탈퇴 요청 수신");
+
+        // 1. 토큰을 통해 인증된 사용자의 카카오 ID 추출
+        String kakaoId = (String) authentication.getPrincipal();
+
+        // 2. 서비스의 탈퇴 로직(리프레시 토큰 삭제 및 논리적 삭제) 호출
+        authService.withdrawUser(kakaoId);
+        log.info("회원 탈퇴 처리 완료 - kakaoId: {}", kakaoId);
+
+        // 3. 성공 메시지 반환
+        return ApiResponse.success("회원 탈퇴가 성공적으로 처리되었습니다.");
     }
 }
