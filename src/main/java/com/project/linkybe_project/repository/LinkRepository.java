@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface LinkRepository extends JpaRepository<Link, Long> {
 
-    // 해당 유저의 전체 링크 (최신순)
+    // 유저의 전체 링크 (최신순)
     List<Link> findByUserOrderByIdDesc(User user);
 
     // 카테고리 필터
