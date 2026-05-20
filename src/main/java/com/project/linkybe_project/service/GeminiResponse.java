@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GeminiService {
+public class GeminiResponse {
 
     // 외부 API 호출을 위한 RestTemplate
     private final RestTemplate restTemplate = new RestTemplate();

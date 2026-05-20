@@ -20,7 +20,7 @@ public class LinkService {
 
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
-    private final GeminiService geminiService;
+    private final GeminiResponse geminiResponse;
 
     // ───────────────────────────────────────────────
     // 링크 저장
@@ -48,7 +48,7 @@ public class LinkService {
 
         // Gemini를 이용한 요약 생성 및 엔티티에 세팅
         log.info("Gemini 요약 생성 시작...");
-        String aiSummary = geminiService.generateSummary(request.getUrl()); // 임시로 URL 전달
+        String aiSummary = geminiResponse.generateSummary(request.getUrl()); // 임시로 URL 전달
         link.updateSummary(aiSummary);
         log.info("Gemini 요약 완료: {}", aiSummary);
 
