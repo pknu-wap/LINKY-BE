@@ -4,6 +4,7 @@ import com.project.linkybe_project.dto.ApiResponse;
 import com.project.linkybe_project.dto.LinkRequest;
 import com.project.linkybe_project.dto.LinkResponse;
 import com.project.linkybe_project.dto.LinkUpdateRequest;
+import com.project.linkybe_project.service.GeminiService;
 import com.project.linkybe_project.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.List;
 public class LinkController {
 
     private final LinkService linkService;
+    private final GeminiService geminiService;
 
     // POST /links — 링크 저장
     @PostMapping
@@ -34,9 +36,6 @@ public class LinkController {
         return ApiResponse.success(linkService.saveLink(kakaoId, request));
     }
 
-    // GET /links                — 전체 조회 (본인 링크만)
-    // GET /links?category=개발  — 카테고리 필터
-    // GET /links?keyword=유튜브  — 키워드 검색
     @GetMapping
     public ApiResponse<List<LinkResponse>> getLinks(
             @RequestParam(required = false) String category,
@@ -92,5 +91,14 @@ public class LinkController {
         String content = new String(file.getBytes(), StandardCharsets.UTF_8);
         int count = linkService.importCsv(kakaoId, content);
         return ApiResponse.success(count + "개의 링크를 불러왔습니다.");
+    }
+
+    // POST /links/summarize — AI 링크 요약
+    @PostMapping("/summarize")
+    public ApiResponse<String> summarizeLink(@RequestParam String url,
+                                             Authentication authentication) {
+        // 인증된 사용자만 사용 가능 (authentication 객체로 검증됨)
+        String summary = geminiService.summarizeUrl(url);
+        return ApiResponse.success(summary);
     }
 }
