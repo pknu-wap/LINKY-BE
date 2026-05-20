@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: LINKY-BE_PROJECT
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/linky_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: remnant260()!
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+jwt:
+  secret: remnant260-linky-secret-key-for-jwt-signing-2024
+  expiration: 3600000 # 1시간 (ms)
+  refresh-expiration: 1209600000 # 14일 (ms)
+
+kakao:
+  client-id: c0e19f94497d0034f9e58642f0d3b49a
+  redirect-uri: http://10.0.2.2:8081/auth/kakao
+
+server:
+  port: 8080
+
+youtube:
+  api-key: dummy-key

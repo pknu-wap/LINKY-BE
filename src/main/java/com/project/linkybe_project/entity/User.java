@@ -2,6 +2,7 @@ package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
@@ -22,12 +25,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-    private String password;
-    private String kakaoId; // 카카오 고유 ID (항상 제공됨)
+    @Column(nullable = false, unique = true)
+    private String kakaoId;         // 카카오 고유 ID — 유저 식별 기준
 
-    @Column
-    private String refreshToken; // 리프레시 토큰 저장 (탈취 방지용 DB 비교)
+    @Column(length = 512)
+    private String refreshToken;    // 리프레시 토큰 (탈취 방지용 DB 보관)
 
     @CreatedDate
     @Column(updatable = false)

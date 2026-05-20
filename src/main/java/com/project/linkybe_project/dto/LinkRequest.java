@@ -10,20 +10,11 @@ import java.time.LocalDateTime;
 @Setter // 프론트에서 온 JSON 데이터를 세팅하기 위해 필요
 @NoArgsConstructor // 기본 생성자도 추가해 주는 것이 안전
 public class LinkRequest {
-    private String url;
 
-    // 사용자가 직접 입력할 수 있는 제목 (없을 수도 있으니 검증 어노테이션은 생략)
-    private String title;
-
-    // 카테고리 (예: "미분류")
-    private String category;
-
-    // 공개/비공개 여부 (프론트에서 true/false로 전송)
-    private Boolean isPrivate;
-
-    // 프론트에서 toIso8601String()으로 보낸 텍스트를 LocalDateTime으로 자동 변환해 줌
-    private LocalDateTime selectedDate;
-
-    // 사용자가 요약칸을 직접 작성하거나, 수정해서 서버로 보낼 때 이 필드에 담기게 됨.
+    private String url;             // 필수
+    private String title;           // 선택 (없으면 메타데이터로 채워짐)
+    private String category;        // 선택 (없으면 null)
+    private Boolean isPrivate;      // 선택 (없으면 null → false 처리)
+    private LocalDateTime selectedDate; // 선택 (리마인더 날짜)
     private String summary;
 }
