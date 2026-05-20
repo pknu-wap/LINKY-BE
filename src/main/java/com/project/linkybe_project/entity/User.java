@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class User {
 
     @Id
@@ -30,4 +34,7 @@ public class User {
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false; // 기본값은 false (삭제되지 않음)
 }

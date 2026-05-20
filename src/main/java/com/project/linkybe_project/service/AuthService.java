@@ -75,4 +75,22 @@ public class AuthService {
         log.info("토큰 갱신 완료 — kakaoId: {}", kakaoId);
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
+
+    // ───────────────────────────────────────────────
+    // 회원 탈퇴 (논리적 삭제)
+    // ───────────────────────────────────────────────
+    @Transactional
+    public void withdrawUser(String kakaoId) {
+        // 1. DB에서 유저 조회
+        User user = userRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
+
+        // 2. 보안을 위해 DB에 저장된 리프레시 토큰 삭제 (로그아웃 효과)
+        user.setRefreshToken(null);
+
+        // 3. 유저 삭제
+        // (주의: User 엔티티에 @SQLDelete를 설정해 두었으므로,
+        // 실제 DB에서 데이터가 날아가지 않고 UPDATE user SET is_deleted = true 가 실행됩니다!)
+        userRepository.delete(user);
+    }
 }
