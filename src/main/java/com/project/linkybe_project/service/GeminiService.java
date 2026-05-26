@@ -21,7 +21,7 @@ public class GeminiService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     // application.yaml의 gemini.api-key 값을 자동으로 주입받음
-    @Value("${gemini.api-key}")
+    @Value("${gemini.api.key}")
     private String apiKey;
 
     public String summarizeUrl(String url) {

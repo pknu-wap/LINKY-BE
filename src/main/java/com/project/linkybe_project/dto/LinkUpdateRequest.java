@@ -11,9 +11,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LinkUpdateRequest {
 
+    String getSummary;
     private String title;
     private String category;
     private Boolean isPrivate;
     private LocalDateTime selectedDate;
     private String memo;
+
+    public String getSummary() {
+        return this.getSummary;
+
+    }
 }

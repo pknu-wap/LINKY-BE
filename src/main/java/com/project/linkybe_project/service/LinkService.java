@@ -44,7 +44,6 @@ public class LinkService {
         link.setCategory(request.getCategory());
         link.setIsPrivate(request.getIsPrivate() != null ? request.getIsPrivate() : false);
         link.setSelectedDate(request.getSelectedDate());
-        link.setMemo(request.getMemo());
         link.setUser(user);
         link.setKakaoId(user.getKakaoId());
 
@@ -86,9 +85,6 @@ public class LinkService {
 
         // 5. 업데이트된 결과를 DTO로 변환하여 프론트엔드로 반환
         return new LinkResponse(link);
-        Link saved = linkRepository.save(link);
-        log.info("링크 저장 완료 — linkId: {}", saved.getId());
-        return new LinkResponse(saved);
     }
 
     // ───────────────────────────────────────────────
@@ -135,11 +131,10 @@ public class LinkService {
                 .orElseThrow(() -> CustomException.notFound(
                         "링크를 찾을 수 없거나 수정 권한이 없습니다."));
 
-        if (request.getTitle() != null)        link.setTitle(request.getTitle());
-        if (request.getCategory() != null)     link.setCategory(request.getCategory());
-        if (request.getIsPrivate() != null)    link.setIsPrivate(request.getIsPrivate());
+        if (request.getTitle() != null) link.setTitle(request.getTitle());
+        if (request.getCategory() != null) link.setCategory(request.getCategory());
+        if (request.getIsPrivate() != null) link.setIsPrivate(request.getIsPrivate());
         if (request.getSelectedDate() != null) link.setSelectedDate(request.getSelectedDate());
-        if (request.getMemo() != null)         link.setMemo(request.getMemo());
 
         // @Transactional 더티 체킹으로 자동 UPDATE
         return new LinkResponse(link);
@@ -181,7 +176,6 @@ public class LinkService {
             sb.append(escapeCsv(link.getCategory())).append(",");
             sb.append(link.getIsPrivate() != null ? link.getIsPrivate() : false).append(",");
             sb.append(link.getSelectedDate() != null ? link.getSelectedDate() : "").append(",");
-            sb.append(escapeCsv(link.getMemo())).append(",");
             sb.append(link.getCreatedAt() != null ? link.getCreatedAt() : "").append("\n");
         }
 
@@ -212,7 +206,6 @@ public class LinkService {
             link.setTitle(parts.length > 2 ? unescapeCsv(parts[2]) : null);
             link.setCategory(parts.length > 3 ? unescapeCsv(parts[3]) : null);
             link.setIsPrivate(parts.length > 4 && "true".equalsIgnoreCase(parts[4].trim()));
-            link.setMemo(parts.length > 6 ? unescapeCsv(parts[6]) : null);
             link.setUser(user);
             link.setKakaoId(user.getKakaoId());
 

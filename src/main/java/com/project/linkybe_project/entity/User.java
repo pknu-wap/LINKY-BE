@@ -25,7 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "kakao_id", unique = true)
     private String kakaoId;         // 카카오 고유 ID — 유저 식별 기준
 
     @Column(length = 512)
@@ -34,7 +34,7 @@ public class User {
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false; // 기본값은 false (삭제되지 않음)
 }

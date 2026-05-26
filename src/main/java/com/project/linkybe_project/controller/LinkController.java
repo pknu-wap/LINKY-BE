@@ -35,7 +35,7 @@ public class LinkController {
         String kakaoId = (String) authentication.getPrincipal();
 
         // Service에서 반환한 저장 결과를 변수에 담습니다.
-        LinkResponse response = linkService.saveLink_DB(kakaoId, request);
+        LinkResponse response = linkService.saveLink(kakaoId, request);
 
         // 프론트엔드에서 바로 확인할 수 있도록 response 객체를 넘겨줌.
         return ApiResponse.success(response);
@@ -47,7 +47,7 @@ public class LinkController {
     @PatchMapping("/{linkId}/summary")
     public ApiResponse<LinkResponse> updateLinkSummary(
             @PathVariable Long linkId,
-            @RequestBody LinkRequest request,
+            @RequestBody LinkUpdateRequest request,
             Authentication authentication) {
 
         // 1. Security Context에서 유저의 카카오 ID 추출
