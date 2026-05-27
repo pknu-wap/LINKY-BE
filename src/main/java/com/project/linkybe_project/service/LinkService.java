@@ -167,7 +167,7 @@ public class LinkService {
         List<Link> links = linkRepository.findByUserOrderByIdDesc(user);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("id,url,title,category,isPrivate,selectedDate,memo,createdAt\n");
+        sb.append("id,url,title,category,isPrivate,selectedDate,isFavorite, summary, kakaoId\n");
 
         for (Link link : links) {
             sb.append(link.getId()).append(",");
@@ -176,7 +176,7 @@ public class LinkService {
             sb.append(escapeCsv(link.getCategory())).append(",");
             sb.append(link.getIsPrivate() != null ? link.getIsPrivate() : false).append(",");
             sb.append(link.getSelectedDate() != null ? link.getSelectedDate() : "").append(",");
-            sb.append(link.getCreatedAt() != null ? link.getCreatedAt() : "").append("\n");
+            sb.append(link.getIsFavorite() != null ? link.getIsFavorite() : false).append(",");
         }
 
         return sb.toString().getBytes(StandardCharsets.UTF_8);

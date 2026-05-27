@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
@@ -36,5 +36,6 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(name = "is_deleted", nullable = false)
+    @org.hibernate.annotations.ColumnDefault("false")
     private boolean isDeleted = false; // 기본값은 false (삭제되지 않음)
 }

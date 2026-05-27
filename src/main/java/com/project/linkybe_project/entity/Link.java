@@ -1,7 +1,6 @@
 package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,7 +33,7 @@ public class Link {
     private String category; // 카테고리 (예: "개발", "미분류")
     private Boolean isPrivate; // 공개(false) / 비공개(true)
     private LocalDateTime selectedDate; // 사용자가 지정한 날짜 (리마인더용)
-    private LocalDateTime createdAt;
+    private String isFavorite;
 
     // ── Gemini가 생성한 요약 ─────────────────────────────
     @Column(columnDefinition = "TEXT")
@@ -46,16 +45,8 @@ public class Link {
     @JoinColumn(name = "kakao_id", referencedColumnName = "kakao_id", nullable = false)
     private User user;
 
-    @Setter(AccessLevel.NONE)
-    @Column(columnDefinition = "TEXT")
-    private String getSummary;
     @Column(name = "kakao_id", nullable = false, insertable = false, updatable = false)
     private String kakaoId;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "kakao_id",
-//            insertable = false, updatable = false)
-//    private User kakaoUser;
 
     public void updateSummary(String summary) {
         this.summary = summary;
