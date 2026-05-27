@@ -1,7 +1,6 @@
 package com.project.linkybe_project.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,9 +45,6 @@ public class Link {
     @JoinColumn(name = "kakao_id", referencedColumnName = "kakao_id", nullable = false)
     private User user;
 
-    @Setter(AccessLevel.NONE)
-    @Column(columnDefinition = "TEXT")
-    private String getSummary;
     @Column(name = "kakao_id", nullable = false, insertable = false, updatable = false)
     private String kakaoId;
 

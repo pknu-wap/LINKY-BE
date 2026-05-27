@@ -23,7 +23,7 @@ public class LinkService {
 
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
-    private final GeminiResponse geminiResponse;
+    private final SummaryAsyncService summaryAsyncService;
 
     // ───────────────────────────────────────────────
     // 링크 저장
@@ -46,17 +46,17 @@ public class LinkService {
         link.setSelectedDate(request.getSelectedDate());
         link.setUser(user);
         link.setKakaoId(user.getKakaoId());
+        link.updateSummary("요약 중...");  // ← 초기 상태 (요구사항)
 
-        // Gemini를 이용한 요약 생성 및 엔티티에 세팅
-        log.info("Gemini 요약 생성 시작...");
-        String aiSummary = geminiResponse.generateSummary(request.getUrl()); // 임시로 URL 전달
-        link.updateSummary(aiSummary);
-        log.info("Gemini 요약 완료: {}", aiSummary);
-
-        //DB 저장 후 반환 객체 변수에 담기 (수정된 부분)
+        // DB에 먼저 저장 (summary = "요약 중...")
         Link savedLink = linkRepository.save(link);
 
-        // 저장된 데이터를 DTO로 변환하여 반환
+        // 비동기로 요약 처리 시작 (별도 스레드에서 실행 — 여기서 기다리지 않음)
+        summaryAsyncService.processSummary(savedLink.getId(), savedLink.getUrl());
+
+        log.info("링크 저장 완료, 비동기 요약 시작 — linkId: {}", savedLink.getId());
+
+        // 즉시 응답 (summary는 아직 "요약 중...")
         return new LinkResponse(savedLink);
     }
 

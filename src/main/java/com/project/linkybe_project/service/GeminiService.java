@@ -15,13 +15,13 @@ import java.util.Map;
 @Service
 public class GeminiService {
 
-    // Gemini 2.5 Flash 모델 (제공된 뼈대 코드의 모델명 사용)
+    // Gemini 2.5 Flash 모델
     private static final String GEMINI_API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     // application.yaml의 gemini.api-key 값을 자동으로 주입받음
-    @Value("${gemini.api.key}")
+    @Value("${gemini.api-key}")
     private String apiKey;
 
     public String summarizeUrl(String url) {
