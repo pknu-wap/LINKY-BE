@@ -41,7 +41,7 @@ public class SummaryAsyncService {
             // 크롤링 결과가 비어있으면 요약 불가
             if (text.isBlank()) {
                 log.warn("[ASYNC] 크롤링 결과 없음 — linkId: {}", linkId);
-                updateSummaryInDb(linkId, "페이지 내용을 가져올 수 없습니다.");
+                updateSummaryAndCategoryInDb(linkId, "페이지 내용을 가져올 수 없습니다.", "전체");
                 return;
             }
 
@@ -53,22 +53,27 @@ public class SummaryAsyncService {
             String summary = geminiResponse.generateSummary(text, keywords);
             log.info("[ASYNC] 요약 생성 완료 — linkId: {}", linkId);
 
-            // Step 4. DB 업데이트
-            updateSummaryInDb(linkId, summary);
+            // Step 4. 카테고리 자동 분류 (keywords + summary 기반)
+            String category = geminiResponse.classifyCategory(keywords, summary);
+            log.info("[ASYNC] 카테고리 분류 완료 — linkId: {}, category: {}", linkId, category);
+
+            // Step 5. DB 업데이트 (summary + category 함께 저장)
+            updateSummaryAndCategoryInDb(linkId, summary, category);
 
         } catch (Exception e) {
             // 어떤 예외가 와도 앱이 죽지 않도록 catch
             log.error("[ASYNC] 요약 처리 중 예외 발생 — linkId: {}, error: {}", linkId, e.getMessage());
-            updateSummaryInDb(linkId, "요약 처리 중 오류가 발생했습니다.");
+            updateSummaryAndCategoryInDb(linkId, "요약 처리 중 오류가 발생했습니다.", "전체");
         }
     }
 
-    // DB에서 해당 링크를 찾아 summary 필드만 업데이트
-    private void updateSummaryInDb(Long linkId, String summary) {
+    // DB에서 해당 링크를 찾아 summary + category 함께 업데이트
+    private void updateSummaryAndCategoryInDb(Long linkId, String summary, String category) {
         linkRepository.findById(linkId).ifPresent(link -> {
             link.updateSummary(summary);
+            link.updateCategory(category);  // ← Link 엔티티에 추가할 메서드
             linkRepository.save(link);
-            log.info("[ASYNC] DB 업데이트 완료 — linkId: {}", linkId);
+            log.info("[ASYNC] DB 업데이트 완료 — linkId: {}, category: {}", linkId, category);
         });
     }
 }

@@ -56,4 +56,20 @@ public class Link {
     public void updateSummary(String summary) {
         this.summary = summary;
     }
+
+    // AI가 카테고리를 업데이트할 때 사용하는 메서드
+    // "즐겨찾기"는 사용자만 설정할 수 있으므로 AI는 절대 지정할 수 없도록 막음
+    public void updateCategory(String category) {
+        if ("즐겨찾기".equals(category)) {
+            // 혹시 AI가 "즐겨찾기"를 반환해도 엔티티 레벨에서 차단
+            this.category = "전체";
+            return;
+        }
+        // 기존에 사용자가 직접 지정한 카테고리가 있으면 덮어쓰지 않음
+        // (사용자가 "즐겨찾기"로 저장한 경우 AI가 바꾸면 안 됨)
+        if ("즐겨찾기".equals(this.category)) {
+            return;
+        }
+        this.category = category;
+    }
 }
