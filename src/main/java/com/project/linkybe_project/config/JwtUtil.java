@@ -26,28 +26,25 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // kakaoId 기준으로 액세스 토큰 생성 (1시간)
-    public String generateToken(String kakaoId) {
+    public String generateToken(String subject) {
         return Jwts.builder()
-                .setSubject(kakaoId)
+                .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // kakaoId 기준으로 리프레시 토큰 생성 (14일)
-    public String generateRefreshToken(String kakaoId) {
+    public String generateRefreshToken(String subject) {
         return Jwts.builder()
-                .setSubject(kakaoId)
+                .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // 토큰에서 kakaoId 추출 (액세스/리프레시 공용)
-    public String getKakaoId(String token) {
+    public String getSubject(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -56,7 +53,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // 토큰 유효성 검증 (액세스/리프레시 공용)
     public boolean validate(String token) {
         try {
             Jwts.parserBuilder()

@@ -29,10 +29,6 @@ jwt:
   expiration: 3600000 # 1시간 (ms)
   refresh-expiration: 1209600000 # 14일 (ms)
 
-kakao:
-  client-id: c0e19f94497d0034f9e58642f0d3b49a
-  redirect-uri: http://10.0.2.2:8081/auth/kakao
-
 server:
   port: 8080
 
