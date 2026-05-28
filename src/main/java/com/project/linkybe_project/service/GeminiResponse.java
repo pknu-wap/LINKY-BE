@@ -18,10 +18,14 @@ public class GeminiResponse {
     // 외부 API 호출을 위한 RestTemplate
     private final RestTemplate restTemplate = new RestTemplate();
     // application.yml에 등록한 API 키를 가져옵니다.
-    @Value("${gemini.api.key}")
+    @Value("${gemini.api.key:}")
     private String apiKey;
 
     public String generateSummary(String targetContent) {
+        if (apiKey == null || apiKey.isBlank()) {
+            return "";
+        }
+
         // 1. API 요청 URL 세팅 (최신 모델인 gemini-1.5-flash 기준)
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
