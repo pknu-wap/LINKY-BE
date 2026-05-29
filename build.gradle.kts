@@ -22,6 +22,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     runtimeOnly("com.mysql:mysql-connector-j")
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.projectlombok:lombok")
@@ -30,7 +31,6 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
 
     // JWT (Java 17 호환 버전)
-    implementation("org.jsoup:jsoup:1.15.3")
     implementation("org.json:json:20230227")
 }
 

@@ -20,7 +20,7 @@ import java.util.List;
 public class LinkService {
 
     private final LinkRepository linkRepository;
-    private final GeminiResponse geminiResponse;
+    private final GeminiService geminiService;
 
     @Transactional
     public LinkResponse saveLink(String deviceUuid, LinkRequest request) {
@@ -39,9 +39,10 @@ public class LinkService {
         link.setSelectedDate(request.getSelectedDate());
 
         log.info("Gemini summary generation started");
-        String aiSummary = geminiResponse.generateSummary(request.getUrl());
+        String aiSummary = geminiService.summarizeUrl(request.getUrl());
         link.updateSummary(aiSummary);
-        log.info("Gemini summary generation completed");
+        log.info("Gemini summary generation completed - summaryLength: {}",
+                aiSummary != null ? aiSummary.length() : 0);
 
         Link savedLink = linkRepository.save(link);
         return new LinkResponse(savedLink);
