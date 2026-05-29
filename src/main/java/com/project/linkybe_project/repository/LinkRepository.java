@@ -1,6 +1,7 @@
 package com.project.linkybe_project.repository;
 
 import com.project.linkybe_project.entity.Link;
+import com.project.linkybe_project.entity.SummaryStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,4 +17,7 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
             String deviceUuid1, String urlKeyword, String deviceUuid2, String titleKeyword);
 
     Optional<Link> findByIdAndDeviceUuid(Long id, String deviceUuid);
+
+    Optional<Link> findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(
+            String url, SummaryStatus summaryStatus);
 }

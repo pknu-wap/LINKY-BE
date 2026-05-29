@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class GeminiService {
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
     private static final int MAX_CONTENT_LENGTH = 12000;
     private static final int CONNECT_TIMEOUT_MILLIS = (int) Duration.ofSeconds(5).toMillis();
+    private static final int MAX_GEMINI_ATTEMPTS = 3;
     private static final String USER_AGENT = "Mozilla/5.0 (compatible; LinkyBot/1.0)";
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -66,8 +68,11 @@ public class GeminiService {
         try {
             String prompt = """
                     Summarize the following web page content in Korean in 3 to 5 sentences.
-                    Do not use markdown. Return plain text only.
-
+                    
+                    Constraints:
+                    1. Do not use markdown formatting. Return plain text only.
+                    2. Start the summary directly without any introductory or conversational phrases (e.g., Do NOT say "이 내용은 ~입니다", "다음은 요약입니다").
+                    3. Focus strictly on the core information and main utility of the page. Exclude unnecessary filler text.
                     %s
                     """.formatted(limitLength(targetContent));
 
@@ -79,12 +84,7 @@ public class GeminiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = restTemplate.exchange(
-                    GEMINI_API_URL + apiKey,
-                    HttpMethod.POST,
-                    entity,
-                    String.class
-            );
+            ResponseEntity<String> response = requestGeminiSummary(entity);
 
             return extractTextFromResponse(response.getBody());
         } catch (Exception e) {
@@ -107,6 +107,30 @@ public class GeminiService {
         String body = document.body() != null ? document.body().text() : "";
 
         return normalizeText(String.join("\n", title, description, body));
+    }
+
+    private ResponseEntity<String> requestGeminiSummary(HttpEntity<Map<String, Object>> entity)
+            throws InterruptedException {
+        for (int attempt = 1; attempt <= MAX_GEMINI_ATTEMPTS; attempt++) {
+            try {
+                return restTemplate.exchange(
+                        GEMINI_API_URL + apiKey,
+                        HttpMethod.POST,
+                        entity,
+                        String.class
+                );
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode().value() != 503 || attempt == MAX_GEMINI_ATTEMPTS) {
+                    throw e;
+                }
+
+                long delayMillis = 1000L * attempt;
+                log.warn("Gemini API returned 503. Retrying - attempt: {}, delayMillis: {}", attempt, delayMillis);
+                Thread.sleep(delayMillis);
+            }
+        }
+
+        throw new IllegalStateException("Gemini API request failed.");
     }
 
     private String normalizeUrl(String url) {

@@ -4,12 +4,15 @@ import com.project.linkybe_project.dto.LinkRequest;
 import com.project.linkybe_project.dto.LinkResponse;
 import com.project.linkybe_project.dto.LinkUpdateRequest;
 import com.project.linkybe_project.entity.Link;
+import com.project.linkybe_project.entity.SummaryStatus;
 import com.project.linkybe_project.exception.CustomException;
 import com.project.linkybe_project.repository.LinkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -20,14 +23,14 @@ import java.util.List;
 public class LinkService {
 
     private final LinkRepository linkRepository;
-    private final GeminiService geminiService;
+    private final LinkSummaryAsyncService linkSummaryAsyncService;
 
     @Transactional
     public LinkResponse saveLink(String deviceUuid, LinkRequest request) {
         log.info("Link save requested - deviceUuid: {}, url: {}", deviceUuid, request.getUrl());
 
         if (request.getUrl() == null || request.getUrl().isBlank()) {
-            throw CustomException.badRequest("URL은 필수입니다.");
+            throw CustomException.badRequest("URL is required");
         }
 
         Link link = new Link();
@@ -38,20 +41,20 @@ public class LinkService {
         link.setIsPrivate(request.getIsPrivate() != null ? request.getIsPrivate() : false);
         link.setSelectedDate(request.getSelectedDate());
 
-        log.info("Gemini summary generation started");
-        String aiSummary = geminiService.summarizeUrl(request.getUrl());
-        link.updateSummary(aiSummary);
-        log.info("Gemini summary generation completed - summaryLength: {}",
-                aiSummary != null ? aiSummary.length() : 0);
-
+        boolean shouldGenerateSummary = applyCachedSummaryOrMarkPending(link);
         Link savedLink = linkRepository.save(link);
+
+        if (shouldGenerateSummary) {
+            scheduleSummaryGenerationAfterCommit(savedLink.getId());
+        }
+
         return new LinkResponse(savedLink);
     }
 
     @Transactional
     public LinkResponse updateLinkSummaryByDevice(Long linkId, String deviceUuid, String newSummary) {
         Link link = getLink(linkId, deviceUuid);
-        link.updateSummary(newSummary);
+        link.markSummaryDone(newSummary);
         log.info("Link summary updated - deviceUuid: {}, linkId: {}", deviceUuid, linkId);
         return new LinkResponse(link);
     }
@@ -139,7 +142,13 @@ public class LinkService {
             link.setTitle(parts.length > 2 ? unescapeCsv(parts[2]) : null);
             link.setCategory(parts.length > 3 ? unescapeCsv(parts[3]) : null);
             link.setIsPrivate(parts.length > 4 && "true".equalsIgnoreCase(parts[4].trim()));
-            link.setSummary(parts.length > 7 ? unescapeCsv(parts[7]) : null);
+
+            String summary = parts.length > 7 ? unescapeCsv(parts[7]) : null;
+            if (summary == null || summary.isBlank()) {
+                link.markSummaryPending();
+            } else {
+                link.markSummaryDone(summary);
+            }
 
             linkRepository.save(link);
             count++;
@@ -151,7 +160,36 @@ public class LinkService {
 
     private Link getLink(Long linkId, String deviceUuid) {
         return linkRepository.findByIdAndDeviceUuid(linkId, deviceUuid)
-                .orElseThrow(() -> CustomException.notFound("링크를 찾을 수 없거나 권한이 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("Link not found or access denied"));
+    }
+
+    private boolean applyCachedSummaryOrMarkPending(Link link) {
+        return linkRepository
+                .findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(link.getUrl(), SummaryStatus.DONE)
+                .map(cachedLink -> {
+                    link.markSummaryDone(cachedLink.getSummary());
+                    log.info("Reused cached summary - url: {}, summaryLength: {}",
+                            link.getUrl(), cachedLink.getSummary().length());
+                    return false;
+                })
+                .orElseGet(() -> {
+                    link.markSummaryPending();
+                    return true;
+                });
+    }
+
+    private void scheduleSummaryGenerationAfterCommit(Long linkId) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            linkSummaryAsyncService.generateSummary(linkId);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                linkSummaryAsyncService.generateSummary(linkId);
+            }
+        });
     }
 
     private String escapeCsv(String value) {
