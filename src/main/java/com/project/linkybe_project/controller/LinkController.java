@@ -46,7 +46,7 @@ public class LinkController {
         return ApiResponse.success(response);
     }
 
-    @PatchMapping("/{linkId}/summary")
+    @PatchMapping("/{linkId:\\d+}/summary")
     public ApiResponse<LinkResponse> updateLinkSummary(
             @RequestHeader(DEVICE_UUID_HEADER) String deviceUuid,
             @PathVariable Long linkId,
@@ -74,18 +74,24 @@ public class LinkController {
         return ApiResponse.success(linkService.getLinks(resolvedDeviceUuid));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id:\\d+}")
     public ApiResponse<LinkResponse> updateLink(@RequestHeader(DEVICE_UUID_HEADER) String deviceUuid,
                                                 @PathVariable Long id,
                                                 @RequestBody LinkUpdateRequest request) {
         return ApiResponse.success(linkService.updateLink(requireDeviceUuid(deviceUuid), id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public ApiResponse<?> deleteLink(@RequestHeader(DEVICE_UUID_HEADER) String deviceUuid,
                                      @PathVariable Long id) {
         linkService.deleteLink(requireDeviceUuid(deviceUuid), id);
         return ApiResponse.success(null);
+    }
+
+    @DeleteMapping("/reset")
+    public ApiResponse<String> resetLinks(@RequestHeader(DEVICE_UUID_HEADER) String deviceUuid) {
+        long deletedCount = linkService.resetLinks(requireDeviceUuid(deviceUuid));
+        return ApiResponse.success(deletedCount + "개의 링크가 초기화되었습니다.");
     }
 
     @GetMapping("/export")

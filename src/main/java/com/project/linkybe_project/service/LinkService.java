@@ -99,6 +99,13 @@ public class LinkService {
         log.info("Link deleted - deviceUuid: {}, linkId: {}", deviceUuid, linkId);
     }
 
+    @Transactional
+    public long resetLinks(String deviceUuid) {
+        long deletedCount = linkRepository.deleteByDeviceUuid(deviceUuid);
+        log.info("Links reset - deviceUuid: {}, deletedCount: {}", deviceUuid, deletedCount);
+        return deletedCount;
+    }
+
     @Transactional(readOnly = true)
     public byte[] exportCsv(String deviceUuid) {
         List<Link> links = linkRepository.findByDeviceUuidOrderByIdDesc(deviceUuid);

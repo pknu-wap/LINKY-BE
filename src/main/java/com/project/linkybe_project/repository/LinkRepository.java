@@ -20,4 +20,6 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
 
     Optional<Link> findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(
             String url, SummaryStatus summaryStatus);
+
+    long deleteByDeviceUuid(String deviceUuid);
 }
