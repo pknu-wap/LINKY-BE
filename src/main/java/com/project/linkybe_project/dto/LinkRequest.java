@@ -1,5 +1,7 @@
 package com.project.linkybe_project.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,5 +18,8 @@ public class LinkRequest {
     private String category;        // 선택 (없으면 null)
     private Boolean isPrivate;      // 선택 (없으면 null → false 처리)
     private LocalDateTime selectedDate; // 선택 (리마인더 날짜)
+    @JsonProperty("if_favorite")
+    @JsonAlias({"ifFavorite", "is_favorite", "isFavorite"})
+    private Boolean ifFavorite;
     private String summary;
 }

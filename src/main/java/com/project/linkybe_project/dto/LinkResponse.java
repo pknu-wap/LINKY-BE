@@ -1,5 +1,6 @@
 package com.project.linkybe_project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.linkybe_project.entity.Link;
 import com.project.linkybe_project.entity.SummaryStatus;
 import lombok.Getter;
@@ -15,6 +16,8 @@ public class LinkResponse {
     private final String category;
     private final Boolean isPrivate;
     private final LocalDateTime selectedDate;
+    @JsonProperty("if_favorite")
+    private final Boolean ifFavorite;
     private final String summary;
     private final SummaryStatus summaryStatus;
 
@@ -25,6 +28,7 @@ public class LinkResponse {
         this.category = link.getCategory();
         this.isPrivate = link.getIsPrivate();
         this.selectedDate = link.getSelectedDate();
+        this.ifFavorite = link.getIfFavorite() != null ? link.getIfFavorite() : false;
         this.summary = link.getSummary();
         this.summaryStatus = link.getSummaryStatus();
     }

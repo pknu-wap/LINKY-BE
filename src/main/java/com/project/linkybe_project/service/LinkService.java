@@ -40,6 +40,7 @@ public class LinkService {
         link.setCategory(request.getCategory());
         link.setIsPrivate(request.getIsPrivate() != null ? request.getIsPrivate() : false);
         link.setSelectedDate(request.getSelectedDate());
+        link.setIfFavorite(request.getIfFavorite() != null ? request.getIfFavorite() : false);
 
         boolean shouldGenerateSummary = applyCachedSummaryOrMarkPending(link);
         Link savedLink = linkRepository.save(link);
@@ -87,6 +88,7 @@ public class LinkService {
         if (request.getCategory() != null) link.setCategory(request.getCategory());
         if (request.getIsPrivate() != null) link.setIsPrivate(request.getIsPrivate());
         if (request.getSelectedDate() != null) link.setSelectedDate(request.getSelectedDate());
+        if (request.getIfFavorite() != null) link.setIfFavorite(request.getIfFavorite());
 
         return new LinkResponse(link);
     }
@@ -111,7 +113,7 @@ public class LinkService {
         List<Link> links = linkRepository.findByDeviceUuidOrderByIdDesc(deviceUuid);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("id,url,title,category,isPrivate,selectedDate,isFavorite,summary,deviceUuid\n");
+        sb.append("id,url,title,category,isPrivate,selectedDate,if_favorite,summary,deviceUuid\n");
 
         for (Link link : links) {
             sb.append(link.getId()).append(",");
@@ -120,7 +122,7 @@ public class LinkService {
             sb.append(escapeCsv(link.getCategory())).append(",");
             sb.append(link.getIsPrivate() != null ? link.getIsPrivate() : false).append(",");
             sb.append(link.getSelectedDate() != null ? link.getSelectedDate() : "").append(",");
-            sb.append(link.getIsFavorite() != null ? link.getIsFavorite() : false).append(",");
+            sb.append(link.getIfFavorite() != null ? link.getIfFavorite() : false).append(",");
             sb.append(escapeCsv(link.getSummary())).append(",");
             sb.append(escapeCsv(link.getDeviceUuid())).append("\n");
         }
@@ -149,6 +151,7 @@ public class LinkService {
             link.setTitle(parts.length > 2 ? unescapeCsv(parts[2]) : null);
             link.setCategory(parts.length > 3 ? unescapeCsv(parts[3]) : null);
             link.setIsPrivate(parts.length > 4 && "true".equalsIgnoreCase(parts[4].trim()));
+            link.setIfFavorite(parts.length > 6 && "true".equalsIgnoreCase(parts[6].trim()));
 
             String summary = parts.length > 7 ? unescapeCsv(parts[7]) : null;
             if (summary == null || summary.isBlank()) {
