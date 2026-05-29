@@ -75,16 +75,9 @@ public class GeminiService {
 
         try {
             String prompt = """
-                    Create a Korean title and summary for the following web page content.
-
-                    Return only valid JSON using this exact shape:
-                    {"title":"short Korean title","summary":"3 to 5 sentence Korean summary"}
-
-                    Constraints:
-                    1. The title must be concise, natural, and no longer than 40 Korean characters.
-                    2. The summary must be plain text without markdown.
-                    3. Do not include introductory or conversational phrases.
-                    4. Focus strictly on the core information and main utility of the page.
+                    Summarize the web page content into JSON.
+                    Format: {"title": "Korean, max 40 chars", "summary": "3-5 sentences plain Korean"}
+                    Rules: No markdown in summary. No conversational text. Focus on core utility.
 
                     %s
                     """.formatted(limitLength(targetContent));

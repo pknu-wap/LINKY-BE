@@ -167,7 +167,7 @@ public class LinkService {
         return linkRepository
                 .findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(link.getUrl(), SummaryStatus.DONE)
                 .map(cachedLink -> {
-                    if ((link.getTitle() == null || link.getTitle().isBlank())
+                    if (shouldReplaceTitle(link.getTitle())
                             && cachedLink.getTitle() != null && !cachedLink.getTitle().isBlank()) {
                         link.setTitle(cachedLink.getTitle());
                     }
@@ -194,6 +194,10 @@ public class LinkService {
                 linkSummaryAsyncService.generateSummary(linkId);
             }
         });
+    }
+
+    private boolean shouldReplaceTitle(String title) {
+        return title == null || title.isBlank() || "요약중입니다...".equals(title.trim());
     }
 
     private String escapeCsv(String value) {

@@ -39,8 +39,7 @@ public class LinkSummaryAsyncService {
             if (!result.successful() || summary == null || summary.isBlank()) {
                 link.markSummaryFailed("Summary could not be generated.");
             } else {
-                if ((link.getTitle() == null || link.getTitle().isBlank())
-                        && result.title() != null && !result.title().isBlank()) {
+                if (shouldReplaceTitle(link.getTitle()) && result.title() != null && !result.title().isBlank()) {
                     link.setTitle(result.title());
                 }
                 link.markSummaryDone(summary);
@@ -53,5 +52,9 @@ public class LinkSummaryAsyncService {
             link.markSummaryFailed("Summary could not be generated.");
             log.error("Async Gemini summary generation failed - linkId: {}, error: {}", link.getId(), e.getMessage());
         }
+    }
+
+    private boolean shouldReplaceTitle(String title) {
+        return title == null || title.isBlank() || "요약 중 입니다...".equals(title.trim());
     }
 }
