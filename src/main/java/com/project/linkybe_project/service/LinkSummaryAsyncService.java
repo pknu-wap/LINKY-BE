@@ -34,17 +34,21 @@ public class LinkSummaryAsyncService {
             link.markSummaryProcessing();
             log.info("Async Gemini summary generation started - linkId: {}, url: {}", link.getId(), link.getUrl());
 
-            String summary = geminiService.summarizeUrl(link.getUrl());
-            if (summary == null || summary.isBlank()) {
+            GeminiSummaryResult result = geminiService.summarizeUrlWithTitle(link.getUrl());
+            String summary = result.summary();
+            if (!result.successful() || summary == null || summary.isBlank()) {
                 link.markSummaryFailed("Summary could not be generated.");
-            } else if (summary.startsWith("An error occurred") || summary.startsWith("Page content could not")) {
-                link.markSummaryFailed(summary);
             } else {
+                if ((link.getTitle() == null || link.getTitle().isBlank())
+                        && result.title() != null && !result.title().isBlank()) {
+                    link.setTitle(result.title());
+                }
                 link.markSummaryDone(summary);
             }
 
-            log.info("Async Gemini summary generation completed - linkId: {}, status: {}, summaryLength: {}",
-                    link.getId(), link.getSummaryStatus(), link.getSummary() != null ? link.getSummary().length() : 0);
+            log.info("Async Gemini summary generation completed - linkId: {}, status: {}, title: {}, summaryLength: {}",
+                    link.getId(), link.getSummaryStatus(), link.getTitle(),
+                    link.getSummary() != null ? link.getSummary().length() : 0);
         } catch (Exception e) {
             link.markSummaryFailed("Summary could not be generated.");
             log.error("Async Gemini summary generation failed - linkId: {}, error: {}", link.getId(), e.getMessage());

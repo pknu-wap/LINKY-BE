@@ -167,6 +167,10 @@ public class LinkService {
         return linkRepository
                 .findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(link.getUrl(), SummaryStatus.DONE)
                 .map(cachedLink -> {
+                    if ((link.getTitle() == null || link.getTitle().isBlank())
+                            && cachedLink.getTitle() != null && !cachedLink.getTitle().isBlank()) {
+                        link.setTitle(cachedLink.getTitle());
+                    }
                     link.markSummaryDone(cachedLink.getSummary());
                     log.info("Reused cached summary - url: {}, summaryLength: {}",
                             link.getUrl(), cachedLink.getSummary().length());

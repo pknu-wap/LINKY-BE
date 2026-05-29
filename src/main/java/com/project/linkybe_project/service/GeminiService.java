@@ -39,9 +39,13 @@ public class GeminiService {
     private String apiKey;
 
     public String summarizeUrl(String url) {
+        return summarizeUrlWithTitle(url).summary();
+    }
+
+    public GeminiSummaryResult summarizeUrlWithTitle(String url) {
         if (apiKey == null || apiKey.isBlank()) {
             log.warn("Gemini API key is not configured. Skipping summary generation.");
-            return "";
+            return GeminiSummaryResult.failure("Summary could not be generated.");
         }
 
         try {
@@ -49,30 +53,39 @@ public class GeminiService {
             String pageText = fetchPageText(normalizedUrl);
             if (pageText.isBlank()) {
                 log.warn("Page content is empty - url: {}", normalizedUrl);
-                return "Page content could not be loaded for summarization.";
+                return GeminiSummaryResult.failure("Page content could not be loaded for summarization.");
             }
 
-            return generateSummary(pageText);
+            return generateTitleAndSummary(pageText);
         } catch (Exception e) {
             log.error("Gemini summary failed - url: {}, error: {}", url, e.getMessage());
-            return "An error occurred while generating the summary.";
+            return GeminiSummaryResult.failure("An error occurred while generating the summary.");
         }
     }
 
     public String generateSummary(String targetContent) {
+        return generateTitleAndSummary(targetContent).summary();
+    }
+
+    public GeminiSummaryResult generateTitleAndSummary(String targetContent) {
         if (apiKey == null || apiKey.isBlank()) {
             log.warn("Gemini API key is not configured. Skipping summary generation.");
-            return "";
+            return GeminiSummaryResult.failure("Summary could not be generated.");
         }
 
         try {
             String prompt = """
-                    Summarize the following web page content in Korean in 3 to 5 sentences.
-                    
+                    Create a Korean title and summary for the following web page content.
+
+                    Return only valid JSON using this exact shape:
+                    {"title":"short Korean title","summary":"3 to 5 sentence Korean summary"}
+
                     Constraints:
-                    1. Do not use markdown formatting. Return plain text only.
-                    2. Start the summary directly without any introductory or conversational phrases (e.g., Do NOT say "이 내용은 ~입니다", "다음은 요약입니다").
-                    3. Focus strictly on the core information and main utility of the page. Exclude unnecessary filler text.
+                    1. The title must be concise, natural, and no longer than 40 Korean characters.
+                    2. The summary must be plain text without markdown.
+                    3. Do not include introductory or conversational phrases.
+                    4. Focus strictly on the core information and main utility of the page.
+
                     %s
                     """.formatted(limitLength(targetContent));
 
@@ -86,10 +99,10 @@ public class GeminiService {
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             ResponseEntity<String> response = requestGeminiSummary(entity);
 
-            return extractTextFromResponse(response.getBody());
+            return extractTitleAndSummaryFromResponse(response.getBody());
         } catch (Exception e) {
             log.error("Gemini API call failed - error: {}", e.getMessage());
-            return "An error occurred while generating the summary.";
+            return GeminiSummaryResult.failure("An error occurred while generating the summary.");
         }
     }
 
@@ -146,6 +159,23 @@ public class GeminiService {
         return description != null ? description.attr("content") : "";
     }
 
+    private GeminiSummaryResult extractTitleAndSummaryFromResponse(String responseBody) throws IOException {
+        String text = extractTextFromResponse(responseBody);
+        if (text.startsWith("Summary result could not")) {
+            return GeminiSummaryResult.failure(text);
+        }
+
+        JsonNode generated = objectMapper.readTree(stripCodeFence(text));
+        String title = generated.path("title").asText("").trim();
+        String summary = generated.path("summary").asText("").trim();
+
+        if (summary.isBlank()) {
+            return GeminiSummaryResult.failure("Summary result could not be loaded.");
+        }
+
+        return GeminiSummaryResult.success(title, summary);
+    }
+
     private String extractTextFromResponse(String responseBody) throws IOException {
         JsonNode root = objectMapper.readTree(responseBody);
         JsonNode textNode = root.path("candidates")
@@ -160,6 +190,16 @@ public class GeminiService {
         }
 
         return textNode.asText();
+    }
+
+    private String stripCodeFence(String text) {
+        String trimmed = text.trim();
+        if (trimmed.startsWith("```")) {
+            trimmed = trimmed.replaceFirst("^```json\\s*", "")
+                    .replaceFirst("^```\\s*", "")
+                    .replaceFirst("\\s*```$", "");
+        }
+        return trimmed.trim();
     }
 
     private String limitLength(String content) {
