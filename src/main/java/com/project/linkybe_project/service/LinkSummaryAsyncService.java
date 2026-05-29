@@ -55,6 +55,6 @@ public class LinkSummaryAsyncService {
     }
 
     private boolean shouldReplaceTitle(String title) {
-        return title == null || title.isBlank() || "요약 중 입니다...".equals(title.trim());
+        return title == null || title.isBlank() || "요약중입니다...".equals(title.trim());
     }
 }
