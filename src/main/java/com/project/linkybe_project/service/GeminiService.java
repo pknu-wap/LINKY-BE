@@ -31,6 +31,7 @@ public class GeminiService {
     private static final int CONNECT_TIMEOUT_MILLIS = (int) Duration.ofSeconds(5).toMillis();
     private static final int MAX_GEMINI_ATTEMPTS = 3;
     private static final String USER_AGENT = "Mozilla/5.0 (compatible; LinkyBot/1.0)";
+    private static final String SUMMARY_FAILED_MESSAGE = "링크 주소를 요약할 수 없습니다";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -45,7 +46,7 @@ public class GeminiService {
     public GeminiSummaryResult summarizeUrlWithTitle(String url) {
         if (apiKey == null || apiKey.isBlank()) {
             log.warn("Gemini API key is not configured. Skipping summary generation.");
-            return GeminiSummaryResult.failure("Summary could not be generated.");
+            return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
         }
 
         try {
@@ -53,13 +54,13 @@ public class GeminiService {
             String pageText = fetchPageText(normalizedUrl);
             if (pageText.isBlank()) {
                 log.warn("Page content is empty - url: {}", normalizedUrl);
-                return GeminiSummaryResult.failure("Page content could not be loaded for summarization.");
+                return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
             }
 
             return generateTitleAndSummary(pageText);
         } catch (Exception e) {
             log.error("Gemini summary failed - url: {}, error: {}", url, e.getMessage());
-            return GeminiSummaryResult.failure("An error occurred while generating the summary.");
+            return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
         }
     }
 
@@ -70,7 +71,7 @@ public class GeminiService {
     public GeminiSummaryResult generateTitleAndSummary(String targetContent) {
         if (apiKey == null || apiKey.isBlank()) {
             log.warn("Gemini API key is not configured. Skipping summary generation.");
-            return GeminiSummaryResult.failure("Summary could not be generated.");
+            return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
         }
 
         try {
@@ -95,7 +96,7 @@ public class GeminiService {
             return extractTitleAndSummaryFromResponse(response.getBody());
         } catch (Exception e) {
             log.error("Gemini API call failed - error: {}", e.getMessage());
-            return GeminiSummaryResult.failure("An error occurred while generating the summary.");
+            return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
         }
     }
 
@@ -154,7 +155,7 @@ public class GeminiService {
 
     private GeminiSummaryResult extractTitleAndSummaryFromResponse(String responseBody) throws IOException {
         String text = extractTextFromResponse(responseBody);
-        if (text.startsWith("Summary result could not")) {
+        if (text.equals(SUMMARY_FAILED_MESSAGE)) {
             return GeminiSummaryResult.failure(text);
         }
 
@@ -163,7 +164,7 @@ public class GeminiService {
         String summary = generated.path("summary").asText("").trim();
 
         if (summary.isBlank()) {
-            return GeminiSummaryResult.failure("Summary result could not be loaded.");
+            return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
         }
 
         return GeminiSummaryResult.success(title, summary);
@@ -179,7 +180,7 @@ public class GeminiService {
                 .path("text");
 
         if (textNode.isMissingNode() || textNode.asText().isBlank()) {
-            return "Summary result could not be loaded.";
+            return SUMMARY_FAILED_MESSAGE;
         }
 
         return textNode.asText();

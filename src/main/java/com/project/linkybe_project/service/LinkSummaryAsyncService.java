@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LinkSummaryAsyncService {
 
+    private static final String SUMMARY_FAILED_MESSAGE = "링크 주소를 요약할 수 없습니다";
+    private static final String TITLE_FAILED_MESSAGE = "제목을 생성할 수 없습니다";
+
     private final LinkRepository linkRepository;
     private final GeminiService geminiService;
 
@@ -37,7 +40,7 @@ public class LinkSummaryAsyncService {
             GeminiSummaryResult result = geminiService.summarizeUrlWithTitle(link.getUrl());
             String summary = result.summary();
             if (!result.successful() || summary == null || summary.isBlank()) {
-                link.markSummaryFailed("Summary could not be generated.");
+                markSummaryFailed(link);
             } else {
                 if (shouldReplaceTitle(link.getTitle()) && result.title() != null && !result.title().isBlank()) {
                     link.setTitle(result.title());
@@ -49,9 +52,16 @@ public class LinkSummaryAsyncService {
                     link.getId(), link.getSummaryStatus(), link.getTitle(),
                     link.getSummary() != null ? link.getSummary().length() : 0);
         } catch (Exception e) {
-            link.markSummaryFailed("Summary could not be generated.");
+            markSummaryFailed(link);
             log.error("Async Gemini summary generation failed - linkId: {}, error: {}", link.getId(), e.getMessage());
         }
+    }
+
+    private void markSummaryFailed(Link link) {
+        if (shouldReplaceTitle(link.getTitle())) {
+            link.setTitle(TITLE_FAILED_MESSAGE);
+        }
+        link.markSummaryFailed(SUMMARY_FAILED_MESSAGE);
     }
 
     private boolean shouldReplaceTitle(String title) {
