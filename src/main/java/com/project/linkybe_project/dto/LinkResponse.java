@@ -16,8 +16,8 @@ public class LinkResponse {
     private final String category;
     private final Boolean isPrivate;
     private final LocalDateTime selectedDate;
-    @JsonProperty("if_favorite")
-    private final Boolean ifFavorite;
+    @JsonProperty("isFavorite")
+    private final Boolean isFavorite;
     private final String summary;
     private final SummaryStatus summaryStatus;
 
@@ -28,7 +28,7 @@ public class LinkResponse {
         this.category = link.getCategory();
         this.isPrivate = link.getIsPrivate();
         this.selectedDate = link.getSelectedDate();
-        this.ifFavorite = link.getIfFavorite() != null ? link.getIfFavorite() : false;
+        this.isFavorite = link.getIsFavorite() != null ? link.getIsFavorite() : false;
         this.summary = link.getSummary();
         this.summaryStatus = link.getSummaryStatus();
     }

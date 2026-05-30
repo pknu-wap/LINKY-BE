@@ -39,8 +39,8 @@ public class Link {
     private String category;
     private Boolean isPrivate;
     private LocalDateTime selectedDate;
-    @Column(name = "if_favorite")
-    private Boolean ifFavorite;
+    @Column(name = "is_favorite")
+    private Boolean isFavorite;
 
     @Column(columnDefinition = "TEXT")
     private String summary;

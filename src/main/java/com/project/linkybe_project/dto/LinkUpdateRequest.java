@@ -1,6 +1,5 @@
 package com.project.linkybe_project.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +17,8 @@ public class LinkUpdateRequest {
     private String category;
     private Boolean isPrivate;
     private LocalDateTime selectedDate;
-    @JsonProperty("if_favorite")
-    @JsonAlias({"ifFavorite", "is_favorite", "isFavorite"})
-    private Boolean ifFavorite;
+    @JsonProperty("isFavorite")
+    private Boolean isFavorite;
     private String memo;
 
     public String getSummary() {
