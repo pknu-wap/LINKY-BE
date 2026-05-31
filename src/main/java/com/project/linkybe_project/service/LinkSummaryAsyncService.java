@@ -18,7 +18,7 @@ public class LinkSummaryAsyncService {
 
     private static final String SUMMARY_FAILED_MESSAGE = "링크 주소를 요약할 수 없습니다";
     private static final String TITLE_FAILED_MESSAGE = "제목을 생성할 수 없습니다";
-    private static final int CATEGORY_CONFIDENCE_THRESHOLD = 70;
+    private static final int CATEGORY_CONFIDENCE_THRESHOLD = 50;
 
     private final LinkRepository linkRepository;
     private final GeminiService geminiService;
