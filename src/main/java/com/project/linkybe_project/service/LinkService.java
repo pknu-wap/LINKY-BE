@@ -15,7 +15,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -42,11 +45,12 @@ public class LinkService {
         link.setSelectedDate(request.getSelectedDate());
         link.setIsFavorite(request.getIsFavorite() != null ? request.getIsFavorite() : false);
 
+        List<String> categoryCandidates = sanitizeCategoryCandidates(request.getCategories());
         boolean shouldGenerateSummary = applyCachedSummaryOrMarkPending(link);
         Link savedLink = linkRepository.save(link);
 
-        if (shouldGenerateSummary) {
-            scheduleSummaryGenerationAfterCommit(savedLink.getId());
+        if (shouldGenerateSummary || !categoryCandidates.isEmpty()) {
+            scheduleSummaryGenerationAfterCommit(savedLink.getId(), categoryCandidates);
         }
 
         return new LinkResponse(savedLink);
@@ -192,18 +196,40 @@ public class LinkService {
                 });
     }
 
-    private void scheduleSummaryGenerationAfterCommit(Long linkId) {
+    private void scheduleSummaryGenerationAfterCommit(Long linkId, List<String> categoryCandidates) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            linkSummaryAsyncService.generateSummary(linkId);
+            linkSummaryAsyncService.generateSummary(linkId, categoryCandidates);
             return;
         }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                linkSummaryAsyncService.generateSummary(linkId);
+                linkSummaryAsyncService.generateSummary(linkId, categoryCandidates);
             }
         });
+    }
+
+    private List<String> sanitizeCategoryCandidates(List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return List.of();
+        }
+
+        Set<String> uniqueCategories = new LinkedHashSet<>();
+        for (String category : categories) {
+            if (category == null || category.isBlank()) {
+                continue;
+            }
+
+            String trimmedCategory = category.trim();
+            if ("전체".equals(trimmedCategory) || "즐겨찾기".equals(trimmedCategory)) {
+                continue;
+            }
+
+            uniqueCategories.add(trimmedCategory);
+        }
+
+        return new ArrayList<>(uniqueCategories);
     }
 
     private boolean shouldReplaceTitle(String title) {

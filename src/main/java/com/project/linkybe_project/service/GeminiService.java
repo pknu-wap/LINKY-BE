@@ -25,8 +25,9 @@ import java.util.Map;
 @Service
 public class GeminiService {
 
-    private static final String GEMINI_API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
+    private static final String GEMINI_API_URL_FORMAT =
+            "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s";
+    private static final String SUMMARY_MODEL = "gemini-2.5-flash";
     private static final int MAX_CONTENT_LENGTH = 12000;
     private static final int CONNECT_TIMEOUT_MILLIS = (int) Duration.ofSeconds(5).toMillis();
     private static final int MAX_GEMINI_ATTEMPTS = 3;
@@ -38,6 +39,9 @@ public class GeminiService {
 
     @Value("${gemini.api.key:}")
     private String apiKey;
+
+    @Value("${gemini.api.classification-model:gemini-2.5-flash-lite}")
+    private String classificationModel;
 
     public String summarizeUrl(String url) {
         return summarizeUrlWithTitle(url).summary();
@@ -91,12 +95,56 @@ public class GeminiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = requestGeminiSummary(entity);
+            ResponseEntity<String> response = requestGemini(entity, SUMMARY_MODEL);
 
             return extractTitleAndSummaryFromResponse(response.getBody());
         } catch (Exception e) {
             log.error("Gemini API call failed - error: {}", e.getMessage());
             return GeminiSummaryResult.failure(SUMMARY_FAILED_MESSAGE);
+        }
+    }
+
+    public GeminiClassificationResult classifyCategory(String summary, List<String> categoryCandidates) {
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Gemini API key is not configured. Skipping category classification.");
+            return GeminiClassificationResult.failure();
+        }
+        if (summary == null || summary.isBlank() || categoryCandidates == null || categoryCandidates.isEmpty()) {
+            return GeminiClassificationResult.failure();
+        }
+
+        try {
+            String categoryJson = objectMapper.writeValueAsString(categoryCandidates);
+            String prompt = """
+                    Classify the summary into the closest category.
+                    Summary:
+                    %s
+
+                    Category candidates:
+                    %s
+
+                    Return JSON only.
+                    Format: {"category": "one candidate exactly", "confidence": 0-100}
+                    Rules:
+                    - category must be one of the candidates exactly.
+                    - confidence must be an integer from 0 to 100.
+                    - If no category clearly matches, choose the closest candidate but use a low confidence.
+                    """.formatted(limitLength(summary), categoryJson);
+
+            Map<String, Object> part = Map.of("text", prompt);
+            Map<String, Object> content = Map.of("parts", List.of(part));
+            Map<String, Object> requestBody = Map.of("contents", List.of(content));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = requestGemini(entity, classificationModel);
+
+            return extractCategoryClassificationFromResponse(response.getBody(), categoryCandidates);
+        } catch (Exception e) {
+            log.error("Gemini category classification failed - error: {}", e.getMessage());
+            return GeminiClassificationResult.failure();
         }
     }
 
@@ -116,12 +164,12 @@ public class GeminiService {
         return normalizeText(String.join("\n", title, description, body));
     }
 
-    private ResponseEntity<String> requestGeminiSummary(HttpEntity<Map<String, Object>> entity)
+    private ResponseEntity<String> requestGemini(HttpEntity<Map<String, Object>> entity, String model)
             throws InterruptedException {
         for (int attempt = 1; attempt <= MAX_GEMINI_ATTEMPTS; attempt++) {
             try {
                 return restTemplate.exchange(
-                        GEMINI_API_URL + apiKey,
+                        GEMINI_API_URL_FORMAT.formatted(model, apiKey),
                         HttpMethod.POST,
                         entity,
                         String.class
@@ -168,6 +216,25 @@ public class GeminiService {
         }
 
         return GeminiSummaryResult.success(title, summary);
+    }
+
+    private GeminiClassificationResult extractCategoryClassificationFromResponse(
+            String responseBody, List<String> categoryCandidates) throws IOException {
+        String text = extractTextFromResponse(responseBody);
+        if (text.equals(SUMMARY_FAILED_MESSAGE)) {
+            return GeminiClassificationResult.failure();
+        }
+
+        JsonNode generated = objectMapper.readTree(stripCodeFence(text));
+        String category = generated.path("category").asText("").trim();
+        int confidence = generated.path("confidence").asInt(0);
+
+        if (category.isBlank() || !categoryCandidates.contains(category)) {
+            return GeminiClassificationResult.failure();
+        }
+
+        confidence = Math.max(0, Math.min(100, confidence));
+        return GeminiClassificationResult.success(category, confidence);
     }
 
     private String extractTextFromResponse(String responseBody) throws IOException {

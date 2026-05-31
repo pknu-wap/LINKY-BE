@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter // 프론트에서 온 JSON 데이터를 세팅하기 위해 필요
@@ -19,5 +20,6 @@ public class LinkRequest {
     private LocalDateTime selectedDate; // 선택 (리마인더 날짜)
     @JsonProperty("isFavorite")
     private Boolean isFavorite;
+    private List<String> categories;
     private String summary;
 }
