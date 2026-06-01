@@ -25,10 +25,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LinkService {
 
+    // 링크 엔티티 조회와 저장을 담당하는 저장소
     private final LinkRepository linkRepository;
+
+    // 링크 요약 생성을 비동기로 처리하는 서비스
     private final LinkSummaryAsyncService linkSummaryAsyncService;
 
     @Transactional
+    // 새 링크를 저장하고 필요한 경우 요약 생성을 예약함
     public LinkResponse saveLink(String deviceUuid, LinkRequest request) {
         log.info("Link save requested - deviceUuid: {}, url: {}", deviceUuid, request.getUrl());
 
@@ -57,6 +61,7 @@ public class LinkService {
     }
 
     @Transactional
+    // 특정 기기의 링크 요약을 직접 수정함
     public LinkResponse updateLinkSummaryByDevice(Long linkId, String deviceUuid, String newSummary) {
         Link link = getLink(linkId, deviceUuid);
         link.markSummaryDone(newSummary);
@@ -65,18 +70,21 @@ public class LinkService {
     }
 
     @Transactional(readOnly = true)
+    // 특정 기기의 모든 링크를 최신순으로 조회함
     public List<LinkResponse> getLinks(String deviceUuid) {
         return linkRepository.findByDeviceUuidOrderByIdDesc(deviceUuid)
                 .stream().map(LinkResponse::new).toList();
     }
 
     @Transactional(readOnly = true)
+    // 특정 기기의 링크를 카테고리별로 조회함
     public List<LinkResponse> getLinksByCategory(String deviceUuid, String category) {
         return linkRepository.findByDeviceUuidAndCategoryOrderByIdDesc(deviceUuid, category)
                 .stream().map(LinkResponse::new).toList();
     }
 
     @Transactional(readOnly = true)
+    // URL이나 제목에 키워드가 포함된 링크를 검색함
     public List<LinkResponse> searchLinks(String deviceUuid, String keyword) {
         return linkRepository
                 .findByDeviceUuidAndUrlContainingOrDeviceUuidAndTitleContainingOrderByIdDesc(
@@ -85,6 +93,7 @@ public class LinkService {
     }
 
     @Transactional
+    // 요청에 포함된 값만 기존 링크에 반영함
     public LinkResponse updateLink(String deviceUuid, Long linkId, LinkUpdateRequest request) {
         Link link = getLink(linkId, deviceUuid);
 
@@ -98,6 +107,7 @@ public class LinkService {
     }
 
     @Transactional
+    // 특정 기기의 링크 하나를 삭제함
     public void deleteLink(String deviceUuid, Long linkId) {
         Link link = getLink(linkId, deviceUuid);
 
@@ -106,6 +116,7 @@ public class LinkService {
     }
 
     @Transactional
+    // 특정 기기에 저장된 모든 링크를 삭제함
     public long resetLinks(String deviceUuid) {
         long deletedCount = linkRepository.deleteByDeviceUuid(deviceUuid);
         log.info("Links reset - deviceUuid: {}, deletedCount: {}", deviceUuid, deletedCount);
@@ -113,6 +124,7 @@ public class LinkService {
     }
 
     @Transactional(readOnly = true)
+    // 특정 기기의 링크 목록을 CSV 파일 내용으로 변환함
     public byte[] exportCsv(String deviceUuid) {
         List<Link> links = linkRepository.findByDeviceUuidOrderByIdDesc(deviceUuid);
 
@@ -135,6 +147,7 @@ public class LinkService {
     }
 
     @Transactional
+    // CSV 내용을 읽어 특정 기기의 링크 목록으로 저장함
     public int importCsv(String deviceUuid, String csvContent) {
         String[] lines = csvContent.split("\n");
         int count = 0;
@@ -172,16 +185,18 @@ public class LinkService {
         return count;
     }
 
+    // 링크 ID와 기기 UUID가 모두 일치하는 링크만 가져온다.
     private Link getLink(Long linkId, String deviceUuid) {
         return linkRepository.findByIdAndDeviceUuid(linkId, deviceUuid)
                 .orElseThrow(() -> CustomException.notFound("Link not found or access denied"));
     }
 
+    // 같은 URL의 완료된 요약이 있으면 재사용하고 없으면 대기 상태로 표시
     private boolean applyCachedSummaryOrMarkPending(Link link) {
         return linkRepository
                 .findFirstByUrlAndSummaryStatusAndSummaryIsNotNullOrderByIdDesc(link.getUrl(), SummaryStatus.DONE)
                 .map(cachedLink -> {
-                    if (shouldReplaceTitle(link.getTitle())
+                    if (LinkTitlePolicy.shouldReplaceTitle(link.getTitle())
                             && cachedLink.getTitle() != null && !cachedLink.getTitle().isBlank()) {
                         link.setTitle(cachedLink.getTitle());
                     }
@@ -196,6 +211,7 @@ public class LinkService {
                 });
     }
 
+    // 트랜잭션 커밋 이후 비동기 요약 생성을 실행함
     private void scheduleSummaryGenerationAfterCommit(Long linkId, List<String> categoryCandidates) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             linkSummaryAsyncService.generateSummary(linkId, categoryCandidates);
@@ -210,6 +226,7 @@ public class LinkService {
         });
     }
 
+    // 자동 분류에 사용할 카테고리 후보에서 빈 값과 기본 탭 이름을 제거
     private List<String> sanitizeCategoryCandidates(List<String> categories) {
         if (categories == null || categories.isEmpty()) {
             return List.of();
@@ -232,10 +249,7 @@ public class LinkService {
         return new ArrayList<>(uniqueCategories);
     }
 
-    private boolean shouldReplaceTitle(String title) {
-        return title == null || title.isBlank() || "요약중입니다...".equals(title.trim());
-    }
-
+    // CSV 필드에 필요한 따옴표 이스케이프를 적용
     private String escapeCsv(String value) {
         if (value == null) return "";
         if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
@@ -244,6 +258,7 @@ public class LinkService {
         return value;
     }
 
+    // CSV 필드의 따옴표 이스케이프를 원래 문자열로 되돌린다.
     private String unescapeCsv(String value) {
         if (value == null) return null;
         value = value.trim();

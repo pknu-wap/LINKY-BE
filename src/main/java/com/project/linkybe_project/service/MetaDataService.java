@@ -2,6 +2,7 @@ package com.project.linkybe_project.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.linkybe_project.dto.LinkMetadataDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,10 +16,12 @@ import java.io.IOException;
 public class MetaDataService {
 
     // application.yml에 등록할 유튜브 API 키
+    // 유튜브 영상 정보를 조회할 때 사용하는 API 키
     @Value("${youtube.api-key}")
     private String youtubeApiKey;
 
-    // 1. 메인 판별기: 유튜브 링크인지 일반 링크인지 여기서 결정
+    // 유튜브 링크인지 일반 링크인지 여기서 결정
+    // URL 종류에 따라 유튜브 전용 메타데이터나 일반 메타데이터를 추출
     public LinkMetadataDto extractMetadata(String url) {
         if (url != null && (url.contains("youtube.com/watch") || url.contains("youtu.be/"))) {
             return extractYoutubeMetadata(url); // 유튜브면 API 출동
@@ -26,7 +29,8 @@ public class MetaDataService {
         return extractBasicMetadata(url); // 아니면 기존 크롤링 출동
     }
 
-    // 2. [신규] 유튜브 API 전용 처리 메서드
+    // 유튜브 API 전용 처리 메서드
+    // 유튜브 API로 영상 제목, 채널명, 썸네일을 가져온다.
     private LinkMetadataDto extractYoutubeMetadata(String url) {
         String videoId = extractYoutubeId(url);
 
@@ -62,7 +66,8 @@ public class MetaDataService {
         return extractBasicMetadata(url);
     }
 
-    // 3. [기존] 작성해두신 일반 웹사이트 크롤링 메서드 (이름만 바꿈)
+    // 작성한 일반 웹사이트 크롤링 메서드 (이름만 바꿈)
+    // 일반 웹페이지의 Open Graph 메타데이터를 가져옴.
     private LinkMetadataDto extractBasicMetadata(String url) {
         try {
             Document doc = Jsoup.connect(url)
@@ -89,13 +94,13 @@ public class MetaDataService {
         }
     }
 
-    // [기존] 헬퍼 메서드: <meta> 태그 파싱
+    // 지정한 Open Graph property의 content 값을 가져옴
     private String getMetaTagContent(Document doc, String property) {
         Element metaTag = doc.selectFirst("meta[property=" + property + "]");
         return metaTag != null ? metaTag.attr("content") : null;
     }
 
-    // [신규] 헬퍼 메서드: 유튜브 URL에서 v= 뒤에 있는 고유 ID만 잘라내기
+    // 유튜브 URL에서 영상 ID만 추출한다.
     private String extractYoutubeId(String url) {
         try {
             if (url.contains("youtube.com/watch?v=")) {
@@ -109,7 +114,4 @@ public class MetaDataService {
         return null;
     }
 
-    // DTO
-    public record LinkMetadataDto(String title, String imageUrl, String description, String originalUrl) {
-    }
 }
