@@ -100,7 +100,11 @@ public class LinkService {
         if (request.getTitle() != null) link.setTitle(request.getTitle());
         if (request.getCategory() != null) link.setCategory(request.getCategory());
         if (request.getIsPrivate() != null) link.setIsPrivate(request.getIsPrivate());
-        if (request.getSelectedDate() != null) link.setSelectedDate(request.getSelectedDate());
+        if (Boolean.TRUE.equals(request.getClearSelectedDate())) {
+            link.setSelectedDate(null);
+        } else if (request.getSelectedDate() != null) {
+            link.setSelectedDate(request.getSelectedDate());
+        }
         if (request.getIsFavorite() != null) link.setIsFavorite(request.getIsFavorite());
 
         return new LinkResponse(link);

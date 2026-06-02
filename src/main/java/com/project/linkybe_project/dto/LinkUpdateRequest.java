@@ -28,6 +28,8 @@ public class LinkUpdateRequest {
     // 변경할 선택 날짜 또는 리마인더 날짜
     private LocalDateTime selectedDate;
 
+    private Boolean clearSelectedDate;
+
     // JSON의 isFavorite 값을 즐겨찾기 여부로 매핑함
     @JsonProperty("isFavorite")
     private Boolean isFavorite;
